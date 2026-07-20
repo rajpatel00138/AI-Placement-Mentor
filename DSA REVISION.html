@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Revision Tracker</title>
+<style>
+  :root{
+    --bg: #0d1117;
+    --bg-elev: #131a22;
+    --line: #21272f;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --green-dim: #1e3a24;
+    --amber: #d29922;
+    --amber-dim: #3a2e10;
+    --blue: #58a6ff;
+    --mono: 'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:900px;margin:0 auto;padding:20px 16px 60px;}
+
+  .top{
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, var(--bg) 80%, transparent);
+    padding-bottom:10px; margin-bottom:8px;
+  }
+  h1{
+    font-family:var(--mono);
+    font-size:20px; font-weight:700; letter-spacing:-0.02em;
+    margin:0 0 2px 0; color:var(--text);
+  }
+  h1 .dot{color:var(--green);}
+  .sub{
+    font-family:var(--mono); font-size:12px; color:var(--muted); margin:0 0 14px 0;
+  }
+
+  .stats{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;
+  }
+  .stat{
+    flex:1; min-width:88px;
+    background:var(--bg-elev); border:1px solid var(--line); border-radius:6px;
+    padding:8px 10px;
+  }
+  .stat .n{font-family:var(--mono); font-size:18px; font-weight:700;}
+  .stat .l{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-top:2px;}
+
+  .overallbar{
+    height:6px; border-radius:3px; background:var(--line); overflow:hidden; margin-bottom:14px;
+  }
+  .overallbar > div{height:100%; background:var(--green); transition:width .3s ease;}
+
+  .toolbar{
+    display:flex; gap:6px; align-items:center; margin-bottom:6px; flex-wrap:wrap;
+  }
+  input#search{
+    flex:1; min-width:140px;
+    background:var(--bg-elev); border:1px solid var(--line); color:var(--text);
+    font-family:var(--sans); font-size:13px; padding:7px 10px; border-radius:6px;
+    outline:none;
+  }
+  input#search:focus{border-color:var(--blue);}
+  .filterbtn{
+    font-family:var(--mono); font-size:11px; padding:7px 10px; border-radius:6px;
+    background:var(--bg-elev); border:1px solid var(--line); color:var(--muted); cursor:pointer;
+    white-space:nowrap;
+  }
+  .filterbtn.active{ border-color:var(--blue); color:var(--blue); }
+  .filterbtn:hover{ color:var(--text); }
+
+  .legend{
+    font-family:var(--mono); font-size:10.5px; color:var(--muted);
+    display:flex; gap:12px; margin: 4px 2px 16px 2px; flex-wrap:wrap;
+  }
+  .legend span b{color:var(--text);}
+
+  .category{
+    border:1px solid var(--line); border-radius:8px; margin-bottom:10px;
+    background:var(--bg-elev); overflow:hidden;
+  }
+  .cat-head{
+    display:flex; align-items:center; gap:10px; padding:11px 12px; cursor:pointer;
+    user-select:none;
+  }
+  .cat-head:hover{ background:#161d26; }
+  .caret{ color:var(--muted); font-size:11px; width:10px; transition:transform .15s ease; }
+  .category.open .caret{ transform:rotate(90deg); }
+  .cat-name{ font-weight:600; font-size:13.5px; flex:1; }
+  .cat-count{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .cat-progress{
+    width:60px; height:5px; background:var(--line); border-radius:3px; overflow:hidden;
+  }
+  .cat-progress > div{ height:100%; background:var(--green); }
+
+  .cat-body{ display:none; border-top:1px solid var(--line); }
+  .category.open .cat-body{ display:block; }
+
+  .group-label{
+    font-family:var(--mono); font-size:10.5px; color:var(--blue);
+    padding:9px 12px 3px 12px; text-transform:uppercase; letter-spacing:.05em;
+  }
+
+  .row{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:7px 12px; border-top:1px solid var(--line);
+  }
+  .row:first-of-type{ border-top:none; }
+  .row.done .pname{ color:var(--muted); text-decoration:line-through; text-decoration-color:#3a4451; }
+  .row.flagged{ background:rgba(210,153,34,0.06); }
+
+  .pname{ flex:1; font-size:13px; min-width:0; overflow-wrap:anywhere; }
+
+  .plinks{ display:flex; gap:6px; flex-shrink:0; }
+  .plink{
+    font-family:var(--mono); font-size:10px; text-decoration:none;
+    padding:3px 7px; border-radius:4px; border:1px solid var(--line);
+    white-space:nowrap;
+  }
+  .plink.lc{ color:#ffa116; border-color:#3a2f1a; }
+  .plink.lc:hover{ border-color:#ffa116; background:rgba(255,161,22,0.08); }
+  .plink.gfg{ color:#2f8d46; border-color:#1a3a22; }
+  .plink.gfg:hover{ border-color:#2f8d46; background:rgba(47,141,70,0.08); }
+
+  .boxes{ display:flex; gap:5px; flex-shrink:0; }
+  .box{
+    width:22px; height:22px; border-radius:5px; border:1px solid var(--line);
+    background:transparent; cursor:pointer; color:var(--muted);
+    font-family:var(--mono); font-size:10px; display:flex; align-items:center; justify-content:center;
+    transition:background .12s, border-color .12s, color .12s;
+  }
+  .box:hover{ border-color:var(--blue); }
+  .box.r-on{ background:var(--green-dim); border-color:var(--green); color:var(--green); }
+  .box.flag{ }
+  .box.flag.f-on{ background:var(--amber-dim); border-color:var(--amber); color:var(--amber); }
+
+  .empty{ padding:20px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:12px; }
+
+  .footer-actions{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:16px; font-family:var(--mono); font-size:11px; color:var(--muted);
+  }
+  .footer-actions button{
+    background:none; border:1px solid var(--line); color:var(--muted);
+    font-family:var(--mono); font-size:11px; padding:6px 10px; border-radius:6px; cursor:pointer;
+  }
+  #resetBtn:hover{ color:#f85149; border-color:#f85149; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <h1>revision<span class="dot">.</span>tracker</h1>
+    <p class="sub">// 230 problems &middot; Rev1&ndash;Rev4 &middot; flag to revisit</p>
+
+    <div class="stats" id="stats"></div>
+    <div class="overallbar"><div id="overallFill" style="width:0%"></div></div>
+
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="filter problems or topic...">
+      <button class="filterbtn active" data-filter="all">all</button>
+      <button class="filterbtn" data-filter="pending">pending</button>
+      <button class="filterbtn" data-filter="done4">rev4 done</button>
+      <button class="filterbtn" data-filter="flagged">flagged</button>
+    </div>
+    <div class="legend">
+      <span><b>R1&ndash;R4</b> = revision passes</span>
+      <span><b>&#9873;</b> = flag to revisit</span>
+      <span id="liveCount"></span>
+    </div>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="footer-actions">
+    <span id="savedNote">loaded</span>
+    <button id="resetBtn">reset all progress</button>
+  </div>
+</div>
+
+<script>
+const DATA = [
+["Array & String (Top 50)", [
+  ["Two Pointer", ["Move Zeroes","Two Sum II – Input Array Is Sorted","3Sum","Sort Colors","Container With Most Water","Trapping Rain Water","Valid Palindrome","Valid Palindrome II","Reverse String","Squares of a Sorted Array","Remove Duplicates from Sorted Array","Merge Sorted Array"]],
+  ["Sliding Window", ["Maximum Sum Subarray of Size K","Maximum Consecutive Ones","Max Consecutive Ones III","Subarray Product Less Than K","Fruits Into Baskets","Minimum Size Subarray Sum","Sliding Window Maximum","Subarrays with K Different Integers","Longest Substring Without Repeating Characters","Longest Substring with K Distinct Characters","Minimum Window Substring","Permutation in String"]],
+  ["Prefix Sum", ["Running Sum of 1D Array","Find Pivot Index","Range Sum Query – Immutable","Subarray Sum Equals K","Matrix Block Sum","Product of Array Except Self","Continuous Subarray Sum","Subarray Sums Divisible by K","Contiguous Array"]],
+  ["Kadane's Algorithm", ["Maximum Subarray","Maximum Product Subarray","Maximum Sum Circular Subarray","Maximum Absolute Sum of Any Subarray","Largest Sum Contiguous Subarray"]],
+  ["General Array", ["Best Time to Buy and Sell Stock","Best Time to Buy and Sell Stock II","Rotate Array","Majority Element","Third Maximum Number","Longest Consecutive Sequence","Find All Numbers Disappeared in an Array"]],
+  ["String", ["Longest Palindromic Substring","Palindromic Substrings","Find All Anagrams in a String","Group Anagrams","Substring with Concatenation of All Words"]]
+]],
+["Matrix", [
+  [null, ["Spiral Matrix","Rotate Image","Set Matrix Zeroes","Search a 2D Matrix","Valid Sudoku","Pascal's Triangle"]]
+]],
+["Binary Search", [
+  [null, ["Sqrt(x)","Search Insert Position","Lower Bound","Upper Bound","Find First and Last Position of Element in Sorted Array","Count Occurrences in a Sorted Array","Search in Rotated Sorted Array","Find Minimum in Rotated Sorted Array","Find Peak Element","Koko Eating Bananas","Allocate Minimum Number of Pages","Capacity to Ship Packages Within D Days","Aggressive Cows","Split Array Largest Sum"]]
+]],
+["HashMap & HashSet", [
+  [null, ["Two Sum","Contains Duplicate","Valid Anagram","Intersection of Two Arrays","First Unique Character in a String"]]
+]],
+["Stack", [
+  [null, ["Valid Parentheses","Min Stack","Next Greater Element I","Daily Temperatures","Online Stock Span","Largest Rectangle in Histogram","Asteroid Collision","Evaluate Reverse Polish Notation","Decode String","Basic Calculator","Implement Queue using Stacks","Remove K Digits","Backspace String Compare","Longest Valid Parentheses","Remove Duplicate Letters","Next Greater Element II","Score of Parentheses","Minimum Add to Make Parentheses Valid","Maximal Rectangle","Simplify Path"]]
+]],
+["Linked List", [
+  [null, ["Search in Linked List","Insert at Head / Tail / Nth Position","Delete Head / Tail / Nth Node","Design Linked List","Middle of the Linked List","Linked List Cycle","Linked List Cycle II","Remove Nth Node From End of List","Reverse Linked List","Reverse Linked List II","Palindrome Linked List","Swap Nodes in Pairs","Reverse Nodes in K-Group","Merge Two Sorted Lists","Merge K Sorted Lists","Sort List","Reorder List","Partition List","Intersection of Two Linked Lists","Add Two Numbers","Copy List with Random Pointer","LRU Cache","Odd Even Linked List","Remove Duplicates from Sorted List","Rotate List"]]
+]],
+["Sorting", [
+  [null, ["Bubble Sort","Selection Sort","Insertion Sort","Merge Sort","Quick Sort","Sort Colors","Merge Intervals"]]
+]],
+["Greedy", [
+  [null, ["Assign Cookies","Lemonade Change","Jump Game","Jump Game II","Gas Station","Non-overlapping Intervals","Minimum Number of Arrows to Burst Balloons","Partition Labels"]]
+]],
+["Math", [
+  [null, ["Reverse Integer","Palindrome Number","Plus One","Sqrt(x)","Pow(x, n)","Count Primes","Happy Number"]]
+]],
+["Bit Manipulation", [
+  [null, ["Single Number","Number of 1 Bits","Counting Bits","Power of Two","Missing Number","Sum of Two Integers"]]
+]],
+["Heap / Priority Queue", [
+  [null, ["Kth Largest Element in an Array","Top K Frequent Elements","K Closest Points to Origin","Merge K Sorted Lists","Find Median from Data Stream","Minimum Cost to Connect Ropes","Task Scheduler","Sliding Window Maximum","Last Stone Weight","Top K Frequent Words","Sort Characters By Frequency","Find K Pairs with Smallest Sums","Smallest Range Covering Elements from K Lists","Implement Min Heap / Priority Queue"]]
+]],
+["Binary Tree & BST", [
+  [null, ["Maximum Depth of Binary Tree","Binary Tree Level Order Traversal","Diameter of Binary Tree","Balanced Binary Tree","Path Sum","Same Tree","Symmetric Tree","Binary Tree Inorder Traversal","Binary Tree Preorder Traversal","Binary Tree Postorder Traversal","Lowest Common Ancestor of a Binary Tree","Binary Tree Maximum Path Sum","Binary Tree Zigzag Level Order Traversal","Binary Tree Right Side View","Validate Binary Search Tree","Search in a Binary Search Tree","Insert into a Binary Search Tree","Kth Smallest Element in a BST","Lowest Common Ancestor of a Binary Search Tree","Convert Sorted Array to Binary Search Tree"]]
+]],
+["Graph", [
+  [null, ["Breadth-First Search (BFS)","Depth-First Search (DFS)","Number of Islands","Flood Fill","Rotting Oranges","Detect Cycle in an Undirected Graph (DFS)","Detect Cycle in an Undirected Graph (BFS)","Detect Cycle in a Directed Graph (DFS + Recursion Stack)","Graph Coloring","Bipartite Graph (BFS)","Bipartite Graph (DFS)","Connected Components in an Undirected Graph","Number of Provinces","Topological Sort","Topological Sort (Kahn's Algorithm)","Course Schedule","Course Schedule II"]]
+]],
+["Backtracking", [
+  [null, ["Subsets","Subsets II","Combination Sum","Combination Sum II","Permutations","Permutations II"]]
+]]
+];
+
+// build flat problem list with stable ids
+let idCounter = 0;
+const catData = DATA.map(([catName, groups]) => {
+  const catId = 'c' + (idCounter++);
+  return {
+    id: catId,
+    name: catName,
+    groups: groups.map(([groupName, problems]) => ({
+      name: groupName,
+      problems: problems.map(p => ({ id: catId + '_' + (idCounter++), name: p }))
+    }))
+  };
+});
+
+const LC_OVERRIDES = {
+  "Two Sum II – Input Array Is Sorted": "two-sum-ii-input-array-is-sorted",
+  "3Sum": "3sum",
+  "Maximum Consecutive Ones": "max-consecutive-ones",
+  "Fruits Into Baskets": "fruit-into-baskets",
+  "Sqrt(x)": "sqrtx",
+  "Pow(x, n)": "powx-n"
+};
+
+// Problems that aren't actual LeetCode problems (GFG/generic/classic algo names) —
+// send these to LeetCode search instead of guessing a slug that would 404.
+const LC_NOT_AVAILABLE = new Set([
+  "Maximum Sum Subarray of Size K",
+  "Longest Substring with K Distinct Characters",
+  "Largest Sum Contiguous Subarray",
+  "Lower Bound", "Upper Bound",
+  "Count Occurrences in a Sorted Array",
+  "Allocate Minimum Number of Pages",
+  "Aggressive Cows",
+  "Search in Linked List",
+  "Insert at Head / Tail / Nth Position",
+  "Delete Head / Tail / Nth Node",
+  "Bubble Sort", "Selection Sort", "Insertion Sort", "Merge Sort", "Quick Sort",
+  "Minimum Cost to Connect Ropes",
+  "Implement Min Heap / Priority Queue",
+  "Breadth-First Search (BFS)", "Depth-First Search (DFS)",
+  "Detect Cycle in an Undirected Graph (DFS)",
+  "Detect Cycle in an Undirected Graph (BFS)",
+  "Detect Cycle in a Directed Graph (DFS + Recursion Stack)",
+  "Graph Coloring",
+  "Bipartite Graph (BFS)", "Bipartite Graph (DFS)",
+  "Connected Components in an Undirected Graph",
+  "Topological Sort", "Topological Sort (Kahn's Algorithm)"
+]);
+
+function leetcodeUrl(name){
+  if(LC_NOT_AVAILABLE.has(name)){
+    return `https://leetcode.com/problemset/?search=${encodeURIComponent(name)}`;
+  }
+  const slug = LC_OVERRIDES[name] || name.toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `https://leetcode.com/problems/${slug}/`;
+}
+
+function gfgUrl(name){
+  return `https://www.geeksforgeeks.org/?s=${encodeURIComponent(name)}`;
+}
+
+const STORAGE_KEY = 'dsa-tracker-progress-v1';
+let state = {}; // { problemId: {r1,r2,r3,r4,flag} }
+let openCats = new Set();
+let currentFilter = 'all';
+let searchTerm = '';
+let storageMode = 'memory'; // 'claude' | 'local' | 'memory'
+
+function defaultRow(){ return { r1:false, r2:false, r3:false, r4:false, flag:false }; }
+
+async function loadState(){
+  // Prefer Claude's artifact storage bridge — persists to your account regardless
+  // of which browser/device opens this artifact (using shared=true).
+  if(window.storage && typeof window.storage.get === 'function'){
+    storageMode = 'claude';
+    try{
+      const res = await window.storage.get(STORAGE_KEY, true);
+      if(res && res.value){ state = JSON.parse(res.value); }
+    }catch(e){
+      // no saved data yet — that's fine, keep storageMode as 'claude' so
+      // the very first save actually writes to Claude's storage instead
+      // of silently falling back to browser-only storage.
+    }
+    return;
+  }
+
+  // Fallback: only used if this file is opened outside Claude entirely
+  // (e.g. double-clicked as a local file). This will NOT sync across
+  // browsers/devices or survive sharing — it's local to this one browser.
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+    storageMode = 'local';
+  }catch(e){
+    storageMode = 'memory';
+  }
+}
+
+let saveTimer = null;
+function saveState(){
+  document.getElementById('savedNote').textContent = 'saving...';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const payload = JSON.stringify(state);
+    try{
+      if(storageMode === 'claude' && window.storage && typeof window.storage.set === 'function'){
+        await window.storage.set(STORAGE_KEY, payload, true);
+        document.getElementById('savedNote').textContent = 'saved';
+        return;
+      }
+      if(storageMode === 'local'){
+        localStorage.setItem(STORAGE_KEY, payload);
+        document.getElementById('savedNote').textContent = 'saved (local)';
+        return;
+      }
+      document.getElementById('savedNote').textContent = 'not saved — refresh will reset';
+    }catch(e){
+      document.getElementById('savedNote').textContent = 'save failed';
+    }
+  }, 250);
+}
+
+function getRow(id){
+  if(!state[id]) state[id] = defaultRow();
+  return state[id];
+}
+
+function allProblems(){
+  const out = [];
+  catData.forEach(cat => cat.groups.forEach(g => g.problems.forEach(p => out.push(p))));
+  return out;
+}
+
+function computeStats(){
+  const probs = allProblems();
+  const total = probs.length;
+  let r1=0,r2=0,r3=0,r4=0,flagged=0;
+  probs.forEach(p => {
+    const row = state[p.id];
+    if(row){
+      if(row.r1) r1++;
+      if(row.r2) r2++;
+      if(row.r3) r3++;
+      if(row.r4) r4++;
+      if(row.flag) flagged++;
+    }
+  });
+  return {total, r1, r2, r3, r4, flagged};
+}
+
+function renderStats(){
+  const s = computeStats();
+  const statsEl = document.getElementById('stats');
+  statsEl.innerHTML = `
+    <div class="stat"><div class="n">${s.total}</div><div class="l">total</div></div>
+    <div class="stat"><div class="n">${s.r1}</div><div class="l">rev1</div></div>
+    <div class="stat"><div class="n">${s.r2}</div><div class="l">rev2</div></div>
+    <div class="stat"><div class="n">${s.r3}</div><div class="l">rev3</div></div>
+    <div class="stat"><div class="n">${s.r4}</div><div class="l">rev4</div></div>
+    <div class="stat"><div class="n" style="color:var(--amber)">${s.flagged}</div><div class="l">flagged</div></div>
+  `;
+  const pct = s.total ? Math.round((s.r4 / s.total) * 100) : 0;
+  document.getElementById('overallFill').style.width = pct + '%';
+  document.getElementById('liveCount').textContent = `${pct}% fully revised (rev4)`;
+}
+
+function matchesFilter(p){
+  const row = state[p.id];
+  if(searchTerm && !p.name.toLowerCase().includes(searchTerm)) return false;
+  if(currentFilter === 'all') return true;
+  if(currentFilter === 'pending') return !(row && row.r4);
+  if(currentFilter === 'done4') return !!(row && row.r4);
+  if(currentFilter === 'flagged') return !!(row && row.flag);
+  return true;
+}
+
+function renderList(){
+  const listEl = document.getElementById('list');
+  listEl.innerHTML = '';
+  let anyVisible = false;
+
+  catData.forEach(cat => {
+    const visibleGroups = cat.groups.map(g => ({
+      name: g.name,
+      problems: g.problems.filter(matchesFilter)
+    })).filter(g => g.problems.length > 0);
+
+    const totalInCat = cat.groups.reduce((a,g) => a + g.problems.length, 0);
+    const doneInCat = cat.groups.reduce((a,g) => a + g.problems.filter(p => state[p.id] && state[p.id].r4).length, 0);
+    const catPct = totalInCat ? Math.round((doneInCat/totalInCat)*100) : 0;
+
+    if(visibleGroups.length === 0) return;
+    anyVisible = true;
+
+    const isOpen = openCats.has(cat.id) || searchTerm.length > 0;
+    const catEl = document.createElement('div');
+    catEl.className = 'category' + (isOpen ? ' open' : '');
+
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    head.innerHTML = `
+      <span class="caret">&#9656;</span>
+      <span class="cat-name">${cat.name}</span>
+      <span class="cat-count">${doneInCat}/${totalInCat}</span>
+      <div class="cat-progress"><div style="width:${catPct}%"></div></div>
+    `;
+    head.addEventListener('click', () => {
+      if(openCats.has(cat.id)) openCats.delete(cat.id);
+      else openCats.add(cat.id);
+      renderList();
+    });
+    catEl.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    visibleGroups.forEach(g => {
+      if(g.name){
+        const gl = document.createElement('div');
+        gl.className = 'group-label';
+        gl.textContent = g.name;
+        body.appendChild(gl);
+      }
+      g.problems.forEach(p => {
+        const row = getRow(p.id);
+        const rowEl = document.createElement('div');
+        rowEl.className = 'row' + (row.r4 ? ' done' : '') + (row.flag ? ' flagged' : '');
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'pname';
+        nameEl.textContent = p.name;
+        rowEl.appendChild(nameEl);
+
+        const linksEl = document.createElement('div');
+        linksEl.className = 'plinks';
+        const lcLink = document.createElement('a');
+        lcLink.className = 'plink lc';
+        lcLink.href = leetcodeUrl(p.name);
+        lcLink.target = '_blank';
+        lcLink.rel = 'noopener noreferrer';
+        lcLink.textContent = 'leetcode';
+        linksEl.appendChild(lcLink);
+
+        const gfgLink = document.createElement('a');
+        gfgLink.className = 'plink gfg';
+        gfgLink.href = gfgUrl(p.name);
+        gfgLink.target = '_blank';
+        gfgLink.rel = 'noopener noreferrer';
+        gfgLink.textContent = 'gfg';
+        linksEl.appendChild(gfgLink);
+
+        rowEl.appendChild(linksEl);
+
+        const boxesEl = document.createElement('div');
+        boxesEl.className = 'boxes';
+
+        ['r1','r2','r3','r4'].forEach((key, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'box' + (row[key] ? ' r-on' : '');
+          btn.textContent = 'R' + (idx+1);
+          btn.title = 'Revision ' + (idx+1);
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            row[key] = !row[key];
+            saveState();
+            renderList();
+            renderStats();
+          });
+          boxesEl.appendChild(btn);
+        });
+
+        const flagBtn = document.createElement('button');
+        flagBtn.className = 'box flag' + (row.flag ? ' f-on' : '');
+        flagBtn.innerHTML = '&#9873;';
+        flagBtn.title = 'Flag to revisit';
+        flagBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          row.flag = !row.flag;
+          saveState();
+          renderList();
+          renderStats();
+        });
+        boxesEl.appendChild(flagBtn);
+
+        rowEl.appendChild(boxesEl);
+        body.appendChild(rowEl);
+      });
+    });
+
+    catEl.appendChild(body);
+    listEl.appendChild(catEl);
+  });
+
+  if(!anyVisible){
+    listEl.innerHTML = '<div class="empty">no problems match this filter</div>';
+  }
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  searchTerm = e.target.value.trim().toLowerCase();
+  renderList();
+});
+
+document.querySelectorAll('.filterbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filterbtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderList();
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', async () => {
+  if(!confirm('Reset all revision progress? This cannot be undone.')) return;
+  state = {};
+  await saveState();
+  renderList();
+  renderStats();
+});
+
+(async function init(){
+  await loadState();
+  // open first category by default
+  if(catData.length) openCats.add(catData[0].id);
+  renderList();
+  renderStats();
+})();
+</script>
+</body>
+</html>
