@@ -13,6 +13,7 @@ import DifficultySelector from "./DifficultySelector";
 import CompanySelector from "./CompanySelector";
 import DurationSelector from "./DurationSelector";
 import StartButton from "./StartButton";
+import QuestionFormatSelector from "./QuestionFormatSelector";
 
 export default function InterviewSetup() {
   return (
@@ -52,6 +53,7 @@ export default function InterviewSetup() {
           <DifficultySelector />
 
           <CompanySelector />
+          <QuestionFormatSelector />
 
         </div>
 

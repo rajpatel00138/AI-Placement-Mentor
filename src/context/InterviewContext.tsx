@@ -1,30 +1,46 @@
-  "use client";
+"use client";
 
-  import {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-  } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+} from "react";
 
-  import {
-    InterviewType,
-    Difficulty,
-    InterviewEvaluationResponse,
-  } from "@/lib/ai/types";
+import {
+  InterviewType,
+  Difficulty,
+  InterviewEvaluationResponse,
+} from "@/lib/ai/types";
 
-  export interface InterviewQuestion {
-    id: number;
-    question: string;
-    difficulty: Difficulty;
-    expectedTime: number;
-  }
+export type QuestionFormat =
+  | "descriptive"
+  | "mcq"
+  | "mixed";
 
-  interface InterviewState {
-    interviewType: InterviewType;
-    difficulty: Difficulty;
-    company: string;
-    duration: number;
+export interface InterviewQuestion {
+  id: number;
+
+  type: "descriptive" | "mcq";
+
+  question: string;
+
+  options?: string[];
+
+  correctAnswer?: string;
+
+  explanation?: string;
+
+  difficulty: Difficulty;
+
+  expectedTime: number;
+}
+
+interface InterviewState {
+  interviewType: InterviewType;
+  difficulty: Difficulty;
+  company: string;
+  duration: number;
 
   questions: InterviewQuestion[];
   currentQuestion: number;
@@ -34,47 +50,144 @@
 
   language: string;
 
-    isInterviewStarted: boolean;
-    isInterviewFinished: boolean;
-  }
+  questionFormat: QuestionFormat;
 
-  interface InterviewContextType {
-    state: InterviewState;
+  isInterviewStarted: boolean;
+  isInterviewFinished: boolean;
+}
 
-    setInterviewType: (type: InterviewType) => void;
-    setDifficulty: (difficulty: Difficulty) => void;
-    setCompany: (company: string) => void;
-    setDuration: (duration: number) => void;
-    setQuestions: (questions: InterviewQuestion[]) => void;
-    setLanguage: (language: string) => void;
+interface InterviewContextType {
+  state: InterviewState;
 
-    setEvaluation: (
-      evaluation: InterviewEvaluationResponse | null
-    ) => void;
+  setInterviewType: (type: InterviewType) => void;
+  setDifficulty: (difficulty: Difficulty) => void;
+  setCompany: (company: string) => void;
+  setDuration: (duration: number) => void;
+  setQuestions: (questions: InterviewQuestion[]) => void;
+  setLanguage: (language: string) => void;
 
-    setAnswer: (
-      questionId: number,
-      answer: string
-    ) => void;
+  setQuestionFormat: (
+    format: QuestionFormat
+  ) => void;
 
-    nextQuestion: () => void;
-    previousQuestion: () => void;
+  setEvaluation: (
+    evaluation: InterviewEvaluationResponse | null
+  ) => void;
 
-    startInterview: () => void;
-    finishInterview: () => void;
+  setAnswer: (
+    questionId: number,
+    answer: string
+  ) => void;
 
-    resetInterview: () => void;
-  }
+  nextQuestion: () => void;
+  previousQuestion: () => void;
 
-  const InterviewContext =
-    createContext<InterviewContextType | null>(null);
+  startInterview: () => void;
+  finishInterview: () => void;
 
-  export function InterviewProvider({
-    children,
-  }: {
-    children: ReactNode;
-  }) {
-    const [state, setState] = useState<InterviewState>({
+  resetInterview: () => void;
+}
+
+const InterviewContext =
+  createContext<InterviewContextType | null>(null);
+
+export function InterviewProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [state, setState] = useState<InterviewState>({
+    interviewType: "technical",
+    difficulty: "medium",
+    company: "Google",
+    duration: 30,
+
+    questions: [],
+    currentQuestion: 0,
+    answers: {},
+
+    evaluation: null,
+
+    language: "English",
+
+    questionFormat: "descriptive",
+
+    isInterviewStarted: false,
+    isInterviewFinished: false,
+  });
+
+    const update = <K extends keyof InterviewState>(
+    key: K,
+    value: InterviewState[K]
+  ) => {
+    setState((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const setAnswer = (
+    questionId: number,
+    answer: string
+  ) => {
+    setState((prev) => ({
+      ...prev,
+      answers: {
+        ...prev.answers,
+        [questionId]: answer,
+      },
+    }));
+  };
+
+  const nextQuestion = () => {
+    setState((prev) => {
+      if (prev.questions.length === 0) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        currentQuestion: Math.min(
+          prev.currentQuestion + 1,
+          prev.questions.length - 1
+        ),
+      };
+    });
+  };
+
+  const previousQuestion = () => {
+    setState((prev) => {
+      if (prev.questions.length === 0) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        currentQuestion: Math.max(
+          prev.currentQuestion - 1,
+          0
+        ),
+      };
+    });
+  };
+
+  const startInterview = () => {
+    setState((prev) => ({
+      ...prev,
+      isInterviewStarted: true,
+      currentQuestion: 0,
+    }));
+  };
+
+  const finishInterview = () => {
+    setState((prev) => ({
+      ...prev,
+      isInterviewFinished: true,
+    }));
+  };
+
+  const resetInterview = () => {
+    setState({
       interviewType: "technical",
       difficulty: "medium",
       company: "Google",
@@ -88,152 +201,68 @@
 
       language: "English",
 
+      questionFormat: "descriptive",
+
       isInterviewStarted: false,
       isInterviewFinished: false,
     });
+  };
 
-    const update = <K extends keyof InterviewState>(
-      key: K,
-      value: InterviewState[K]
-    ) => {
-      setState((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    };
+  return (
+    <InterviewContext.Provider
+      value={{
+        state,
 
-    const setAnswer = (
-      questionId: number,
-      answer: string
-    ) => {
-      setState((prev) => ({
-        ...prev,
-        answers: {
-          ...prev.answers,
-          [questionId]: answer,
-        },
-      }));
-    };
+        setInterviewType: (v) =>
+          update("interviewType", v),
 
-    const nextQuestion = () => {
-      setState((prev) => {
-        if (prev.questions.length === 0) {
-          return prev;
-        }
+        setDifficulty: (v) =>
+          update("difficulty", v),
 
-        return {
-          ...prev,
-          currentQuestion: Math.min(
-            prev.currentQuestion + 1,
-            prev.questions.length - 1
-          ),
-        };
-      });
-    };
+        setCompany: (v) =>
+          update("company", v),
 
-    const previousQuestion = () => {
-      setState((prev) => {
-        if (prev.questions.length === 0) {
-          return prev;
-        }
+        setDuration: (v) =>
+          update("duration", v),
 
-        return {
-          ...prev,
-          currentQuestion: Math.max(
-            prev.currentQuestion - 1,
-            0
-          ),
-        };
-      });
-    };
+        setQuestions: (v) =>
+          update("questions", v),
 
-    const startInterview = () => {
-      setState((prev) => ({
-        ...prev,
-        isInterviewStarted: true,
-        currentQuestion: 0,
-      }));
-    };
+        setLanguage: (v) =>
+          update("language", v),
 
-    const finishInterview = () => {
-      setState((prev) => ({
-        ...prev,
-        isInterviewFinished: true,
-      }));
-    };
+        setQuestionFormat: (v) =>
+          update("questionFormat", v),
 
-    const resetInterview = () => {
-      setState({
-        interviewType: "technical",
-        difficulty: "medium",
-        company: "Google",
-        duration: 30,
+        setEvaluation: (v) =>
+          update("evaluation", v),
 
-      questions: [],
-      currentQuestion: 0,
-      answers: {},
+        setAnswer,
 
-      evaluation: null,
+        nextQuestion,
 
-      language: "English",
+        previousQuestion,
 
-        isInterviewStarted: false,
-        isInterviewFinished: false,
-      });
-    };
+        startInterview,
 
-    return (
-      <InterviewContext.Provider
-        value={{
-          state,
+        finishInterview,
 
-          setInterviewType: (v) =>
-            update("interviewType", v),
+        resetInterview,
+      }}
+    >
+      {children}
+    </InterviewContext.Provider>
+  );
+}
 
-          setDifficulty: (v) =>
-            update("difficulty", v),
+export function useInterview() {
+  const context = useContext(InterviewContext);
 
-          setCompany: (v) =>
-            update("company", v),
-
-          setDuration: (v) =>
-            update("duration", v),
-
-          setQuestions: (v) =>
-            update("questions", v),
-
-          setLanguage: (v) =>
-            update("language", v),
-
-          setEvaluation: (v) =>
-            update("evaluation", v),
-
-          setAnswer,
-
-          nextQuestion,
-
-          previousQuestion,
-
-          startInterview,
-
-          finishInterview,
-
-          resetInterview,
-        }}
-      >
-        {children}
-      </InterviewContext.Provider>
+  if (!context) {
+    throw new Error(
+      "useInterview must be used inside InterviewProvider"
     );
   }
 
-  export function useInterview() {
-    const context = useContext(InterviewContext);
-
-    if (!context) {
-      throw new Error(
-        "useInterview must be used inside InterviewProvider"
-      );
-    }
-
-    return context;
-  }
+  return context;
+}

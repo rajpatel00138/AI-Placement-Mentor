@@ -15,13 +15,13 @@ export async function POST(req: NextRequest) {
       difficulty,
       company,
       language,
+      questionFormat = "descriptive",
       numberOfQuestions = 5,
     } = await req.json();
-
     const prompt = `
 You are a Senior Software Engineering Interviewer.
 
-Generate exactly ${numberOfQuestions} MULTIPLE CHOICE interview questions.
+Generate exactly ${numberOfQuestions} interview questions.
 
 Interview Type:
 ${interviewType}
@@ -35,32 +35,55 @@ ${company}
 Language:
 ${language}
 
+Question Format:
+${questionFormat}
+
 Rules:
+
 - Return ONLY valid JSON.
 - Do NOT return markdown.
 - Do NOT wrap inside \`\`\`.
-- Generate ONLY MCQ questions.
-- Every question must have exactly 4 options.
-- Only ONE option must be correct.
 - expectedTime must be an integer.
-- Questions should be suitable for ${company} interviews.
 
-Return exactly:
+Question Format Rules:
 
-[
-  {
-    "question": "Which data structure follows FIFO?",
-    "options": [
-      "Stack",
-      "Queue",
-      "Tree",
-      "Graph"
-    ],
-    "correctAnswer": "Queue",
-    "explanation": "Queue follows First In First Out.",
-    "expectedTime": 2
-  }
-]
+1. If questionFormat = "descriptive"
+
+Return ONLY descriptive questions.
+
+Each object:
+
+{
+  "type":"descriptive",
+  "question":"",
+  "expectedTime":3
+}
+
+2. If questionFormat = "mcq"
+
+Return ONLY MCQs.
+
+Each object:
+
+{
+  "type":"mcq",
+  "question":"",
+  "options":[
+    "",
+    "",
+    "",
+    ""
+  ],
+  "correctAnswer":"",
+  "explanation":"",
+  "expectedTime":2
+}
+
+3. If questionFormat = "mixed"
+
+Generate a balanced mix of descriptive and MCQ questions.
+
+Return ONLY JSON array.
 `;
 
     const response = await ai.models.generateContent({

@@ -41,6 +41,7 @@ export default function StartButton() {
           difficulty: state.difficulty,
           company: state.company,
           language: state.language,
+          questionFormat: state.questionFormat,
           numberOfQuestions: 5,
         }),
       });
@@ -54,14 +55,29 @@ export default function StartButton() {
       const questions = data.questions.map(
         (
           q: {
+            type?: "descriptive" | "mcq";
             question: string;
+            options?: string[];
+            correctAnswer?: string;
+            explanation?: string;
             expectedTime?: number;
           },
           index: number
         ) => ({
           id: index + 1,
+
+          type: q.type ?? "descriptive",
+
           question: q.question,
+
+          options: q.options,
+
+          correctAnswer: q.correctAnswer,
+
+          explanation: q.explanation,
+
           difficulty: state.difficulty,
+
           expectedTime: q.expectedTime ?? 3,
         })
       );
