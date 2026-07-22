@@ -7,34 +7,40 @@ import {
   Zap,
 } from "lucide-react";
 
-const scores = [
-  {
-    title: "Overall",
-    value: 82,
-    icon: Trophy,
-    color: "from-violet-500 to-indigo-500",
-  },
-  {
-    title: "Technical",
-    value: 85,
-    icon: Brain,
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    title: "Communication",
-    value: 78,
-    icon: MessageCircle,
-    color: "from-green-500 to-emerald-500",
-  },
-  {
-    title: "Confidence",
-    value: 80,
-    icon: Zap,
-    color: "from-orange-500 to-yellow-500",
-  },
-];
+import { useInterview } from "@/context/InterviewContext";
 
 export default function ScoreCard() {
+  const { state } = useInterview();
+
+  const evaluation = state.evaluation;
+
+  const scores = [
+    {
+      title: "Overall",
+      value: evaluation?.overallScore ?? 0,
+      icon: Trophy,
+      color: "from-violet-500 to-indigo-500",
+    },
+    {
+      title: "Technical",
+      value: evaluation?.technicalScore ?? 0,
+      icon: Brain,
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      title: "Communication",
+      value: evaluation?.communicationScore ?? 0,
+      icon: MessageCircle,
+      color: "from-green-500 to-emerald-500",
+    },
+    {
+      title: "Confidence",
+      value: evaluation?.confidenceScore ?? 0,
+      icon: Zap,
+      color: "from-orange-500 to-yellow-500",
+    },
+  ];
+
   return (
     <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {scores.map((score) => {

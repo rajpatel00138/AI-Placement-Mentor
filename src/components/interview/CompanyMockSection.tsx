@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Building2,
@@ -10,42 +11,42 @@ import {
 const companies = [
   {
     name: "Google",
-    difficulty: "Hard",
+    difficulty: "hard",
     duration: "60 min",
     questions: 25,
     color: "from-blue-500/20 to-cyan-500/10",
   },
   {
     name: "Amazon",
-    difficulty: "Medium",
+    difficulty: "medium",
     duration: "45 min",
     questions: 20,
     color: "from-orange-500/20 to-yellow-500/10",
   },
   {
     name: "Microsoft",
-    difficulty: "Hard",
+    difficulty: "hard",
     duration: "60 min",
     questions: 25,
     color: "from-green-500/20 to-emerald-500/10",
   },
   {
     name: "Zoho",
-    difficulty: "Medium",
+    difficulty: "medium",
     duration: "40 min",
     questions: 18,
     color: "from-red-500/20 to-pink-500/10",
   },
   {
     name: "Infosys",
-    difficulty: "Easy",
+    difficulty: "easy",
     duration: "30 min",
     questions: 15,
     color: "from-indigo-500/20 to-blue-500/10",
   },
   {
     name: "TCS",
-    difficulty: "Easy",
+    difficulty: "easy",
     duration: "30 min",
     questions: 15,
     color: "from-slate-500/20 to-slate-700/10",
@@ -53,6 +54,8 @@ const companies = [
 ];
 
 export default function CompanyMockSection() {
+  const router = useRouter();
+
   return (
     <section className="space-y-6">
       <div>
@@ -81,7 +84,7 @@ export default function CompanyMockSection() {
                   {company.name}
                 </h3>
 
-                <p className="text-sm text-slate-300">
+                <p className="text-sm text-slate-300 capitalize">
                   {company.difficulty} Level
                 </p>
               </div>
@@ -99,7 +102,16 @@ export default function CompanyMockSection() {
               </div>
             </div>
 
-            <button className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white transition-all hover:bg-violet-500">
+            <button
+              onClick={() =>
+                router.push(
+                  `/dashboard/interview/start?company=${encodeURIComponent(
+                    company.name
+                  )}&difficulty=${company.difficulty}`
+                )
+              }
+              className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white transition-all hover:bg-violet-500"
+            >
               Start Mock
               <ArrowRight size={18} />
             </button>

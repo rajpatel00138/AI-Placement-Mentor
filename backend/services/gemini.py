@@ -5,10 +5,15 @@ from google import genai
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    raise Exception("GEMINI_API_KEY not found")
+
+client = genai.Client(api_key=api_key)
 
 
-def analyze_resume(resume_text):
+def analyze_resume(resume_text: str):
     prompt = f"""
 You are an ATS Resume Analyzer.
 
@@ -32,13 +37,17 @@ Resume:
 """
 
     response = client.models.generate_content(
-        model="gemini-flash-latest",
-        contents=prompt
+        model="gemini-3.1-flash-lite",
+        contents=prompt,
     )
 
     text = response.text.strip()
 
     if text.startswith("```"):
-        text = text.replace("```json", "").replace("```", "").strip()
+        text = (
+            text.replace("```json", "")
+            .replace("```", "")
+            .strip()
+        )
 
     return json.loads(text)

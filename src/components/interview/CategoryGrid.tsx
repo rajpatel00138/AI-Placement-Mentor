@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   Users,
   Laptop2,
@@ -15,6 +16,7 @@ import {
 const categories = [
   {
     title: "HR Interview",
+    type: "hr",
     description: "Behavioral & communication round",
     icon: Users,
     color: "text-pink-400",
@@ -22,6 +24,7 @@ const categories = [
   },
   {
     title: "Technical Interview",
+    type: "technical",
     description: "Core CS & programming concepts",
     icon: Laptop2,
     color: "text-blue-400",
@@ -29,6 +32,7 @@ const categories = [
   },
   {
     title: "DSA",
+    type: "dsa",
     description: "Coding & problem solving",
     icon: BrainCircuit,
     color: "text-violet-400",
@@ -36,6 +40,7 @@ const categories = [
   },
   {
     title: "DBMS",
+    type: "dbms",
     description: "SQL, Transactions & Queries",
     icon: Database,
     color: "text-green-400",
@@ -43,6 +48,7 @@ const categories = [
   },
   {
     title: "Operating System",
+    type: "os",
     description: "Process, Threads & Scheduling",
     icon: Cpu,
     color: "text-orange-400",
@@ -50,6 +56,7 @@ const categories = [
   },
   {
     title: "Computer Networks",
+    type: "cn",
     description: "TCP/IP, HTTP & Protocols",
     icon: Network,
     color: "text-cyan-400",
@@ -57,6 +64,7 @@ const categories = [
   },
   {
     title: "System Design",
+    type: "system-design",
     description: "Scalable architecture concepts",
     icon: Boxes,
     color: "text-yellow-400",
@@ -64,6 +72,7 @@ const categories = [
   },
   {
     title: "Company Interviews",
+    type: "technical",
     description: "Google, Amazon, Zoho & more",
     icon: Building2,
     color: "text-red-400",
@@ -72,6 +81,8 @@ const categories = [
 ];
 
 export default function CategoryGrid() {
+  const router = useRouter();
+
   return (
     <section className="space-y-6">
       <div>
@@ -91,15 +102,15 @@ export default function CategoryGrid() {
           return (
             <button
               key={category.title}
+              onClick={() =>
+                router.push(
+                  `/dashboard/interview/start?type=${category.type}`
+                )
+              }
               className="group rounded-3xl border border-slate-800 bg-slate-900/70 p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-xl hover:shadow-violet-500/10"
             >
-              <div
-                className={`inline-flex rounded-2xl ${category.bg} p-3`}
-              >
-                <Icon
-                  size={28}
-                  className={category.color}
-                />
+              <div className={`inline-flex rounded-2xl ${category.bg} p-3`}>
+                <Icon size={28} className={category.color} />
               </div>
 
               <h3 className="mt-5 text-lg font-semibold text-white">
