@@ -9,6 +9,7 @@ import {
   Cpu,
   Network,
   Boxes,
+  Calculator,
   Building2,
   ArrowRight,
 } from "lucide-react";
@@ -17,66 +18,56 @@ const categories = [
   {
     title: "HR Interview",
     type: "hr",
-    description: "Behavioral & communication round",
+    description: "Behavioral questions, culture fit & STAR method responses",
     icon: Users,
-    color: "text-pink-400",
-    bg: "bg-pink-500/15",
   },
   {
     title: "Technical Interview",
     type: "technical",
-    description: "Core CS & programming concepts",
+    description: "Core CS principles, programming concepts & debugging",
     icon: Laptop2,
-    color: "text-blue-400",
-    bg: "bg-blue-500/15",
   },
   {
-    title: "DSA",
+    title: "DSA & Problem Solving",
     type: "dsa",
-    description: "Coding & problem solving",
+    description: "Algorithms, complexity analysis & live coding explanations",
     icon: BrainCircuit,
-    color: "text-violet-400",
-    bg: "bg-violet-500/15",
   },
   {
-    title: "DBMS",
+    title: "Database Management",
     type: "dbms",
-    description: "SQL, Transactions & Queries",
+    description: "SQL queries, normalization, ACID properties & indexing",
     icon: Database,
-    color: "text-green-400",
-    bg: "bg-green-500/15",
   },
   {
-    title: "Operating System",
+    title: "Operating Systems",
     type: "os",
-    description: "Process, Threads & Scheduling",
+    description: "Processes, multithreading, concurrency, memory & deadlock",
     icon: Cpu,
-    color: "text-orange-400",
-    bg: "bg-orange-500/15",
   },
   {
     title: "Computer Networks",
     type: "cn",
-    description: "TCP/IP, HTTP & Protocols",
+    description: "TCP/IP, HTTP/S, DNS, OSI model layers & network security",
     icon: Network,
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/15",
   },
   {
     title: "System Design",
     type: "system-design",
-    description: "Scalable architecture concepts",
+    description: "Scalable architecture, load balancers, caching & microservices",
     icon: Boxes,
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/15",
   },
   {
-    title: "Company Interviews",
+    title: "Quantitative Aptitude",
+    type: "aptitude",
+    description: "Logical reasoning, arithmetic problems & data interpretation",
+    icon: Calculator,
+  },
+  {
+    title: "Company Specific",
     type: "technical",
-    description: "Google, Amazon, Zoho & more",
+    description: "Tailored interview rounds for Google, Amazon, Microsoft & TCS",
     icon: Building2,
-    color: "text-red-400",
-    bg: "bg-red-500/15",
   },
 ];
 
@@ -84,18 +75,18 @@ export default function CategoryGrid() {
   const router = useRouter();
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-5">
       <div>
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-primary">
           Interview Categories
         </h2>
 
-        <p className="mt-2 text-slate-400">
-          Select a category and start practicing with AI-powered mock interviews.
+        <p className="mt-1 text-sm text-muted">
+          Choose a domain and start practicing with AI-powered mock interviews.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {categories.map((category) => {
           const Icon = category.icon;
 
@@ -103,30 +94,25 @@ export default function CategoryGrid() {
             <button
               key={category.title}
               onClick={() =>
-                router.push(
-                  `/dashboard/interview/start?type=${category.type}`
-                )
+                router.push(`/dashboard/interview/start?type=${category.type}`)
               }
-              className="group rounded-3xl border border-slate-800 bg-slate-900/70 p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-xl hover:shadow-violet-500/10"
+              className="group rounded-2xl border border-border bg-surface p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:shadow-md cursor-pointer"
             >
-              <div className={`inline-flex rounded-2xl ${category.bg} p-3`}>
-                <Icon size={28} className={category.color} />
+              <div className="inline-flex rounded-xl border border-border bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
+                <Icon size={22} className="text-accent" />
               </div>
 
-              <h3 className="mt-5 text-lg font-semibold text-white">
+              <h3 className="mt-4 text-base font-bold text-primary group-hover:text-accent transition">
                 {category.title}
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted">
                 {category.description}
               </p>
 
-              <div className="mt-6 flex items-center gap-2 text-violet-400 opacity-0 transition-all group-hover:opacity-100">
-                <span className="text-sm font-medium">
-                  Start Practice
-                </span>
-
-                <ArrowRight size={16} />
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-accent opacity-0 transition-all duration-300 group-hover:opacity-100">
+                <span>Start Practice</span>
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </div>
             </button>
           );

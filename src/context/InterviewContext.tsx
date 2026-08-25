@@ -2,16 +2,19 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useState,
   ReactNode,
 } from "react";
 
 import {
-  InterviewType,
-  Difficulty,
+  type InterviewType,
+  type Difficulty,
   InterviewEvaluationResponse,
 } from "@/lib/ai/types";
+
+export type { InterviewType, Difficulty } from "@/lib/ai/types";
 
 export type QuestionFormat =
   | "descriptive"
@@ -139,6 +142,13 @@ export function InterviewProvider({
     }));
   };
 
+  const setInterviewType = useCallback((type: InterviewType) => {
+    setState((prev) => ({
+      ...prev,
+      interviewType: type,
+    }));
+  }, []);
+
   const nextQuestion = () => {
     setState((prev) => {
       if (prev.questions.length === 0) {
@@ -213,8 +223,7 @@ export function InterviewProvider({
       value={{
         state,
 
-        setInterviewType: (v) =>
-          update("interviewType", v),
+        setInterviewType,
 
         setDifficulty: (v) =>
           update("difficulty", v),

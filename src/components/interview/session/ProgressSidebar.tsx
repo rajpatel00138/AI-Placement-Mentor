@@ -13,7 +13,6 @@ import {
 import { useRouter } from "next/navigation";
 
 import { useInterview } from "@/context/InterviewContext";
-// import { evaluateInterview } from "@/lib/ai/interview";  
 
 export default function ProgressSidebar() {
   const router = useRouter();
@@ -36,54 +35,62 @@ export default function ProgressSidebar() {
     (answer) => answer.trim().length > 0
   ).length;
 
+  const currentQuestionData =
+    state.questions[state.currentQuestion];
+
+  const hasAnsweredCurrentQuestion =
+    currentQuestionData
+      ? (state.answers[currentQuestionData.id] ?? "").trim().length > 0
+      : false;
+
   const progress =
     totalQuestions === 0
       ? 0
-      : (currentQuestion / totalQuestions) * 100;
+      : (answeredQuestions / totalQuestions) * 100;
 
   const handleFinishInterview = async () => {
-  try {
-    setIsEvaluating(true);
+    try {
+      setIsEvaluating(true);
 
-    const response = await fetch("/api/interview/evaluate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        interviewType: state.interviewType,
-        difficulty: state.difficulty,
-        company: state.company,
-        questions: state.questions.map((q) => ({
-          question: q.question,
-          answer: state.answers[q.id] ?? "",
-        })),
-      }),
-    });
+      const response = await fetch("/api/interview/evaluate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          interviewType: state.interviewType,
+          difficulty: state.difficulty,
+          company: state.company,
+          questions: state.questions.map((q) => ({
+            question: q.question,
+            answer: state.answers[q.id] ?? "",
+          })),
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || "Evaluation failed.");
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Evaluation failed.");
+      }
+
+      setEvaluation(data.evaluation);
+
+      finishInterview();
+
+      router.push("/dashboard/interview/report");
+    } catch (error) {
+      console.error("Interview evaluation failed:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to evaluate interview."
+      );
+    } finally {
+      setIsEvaluating(false);
     }
-
-    setEvaluation(data.evaluation);
-
-    finishInterview();
-
-    router.push("/dashboard/interview/report");
-  } catch (error) {
-    console.error("Interview evaluation failed:", error);
-
-    alert(
-      error instanceof Error
-        ? error.message
-        : "Failed to evaluate interview."
-    );
-  } finally {
-    setIsEvaluating(false);
-  }
-};
+  };
 
   return (
     <aside className="sticky top-6 h-fit rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
@@ -104,7 +111,7 @@ export default function ProgressSidebar() {
           </span>
 
           <span className="font-semibold text-white">
-            {currentQuestion} / {totalQuestions}
+            {answeredQuestions} / {totalQuestions}
           </span>
         </div>
 
@@ -116,6 +123,10 @@ export default function ProgressSidebar() {
             }}
           />
         </div>
+
+        <p className="mt-2 text-center text-xs text-slate-400">
+          Question {currentQuestion} of {totalQuestions}
+        </p>
       </div>
 
       {/* Stats */}
@@ -162,7 +173,8 @@ export default function ProgressSidebar() {
           onClick={nextQuestion}
           disabled={
             state.currentQuestion === totalQuestions - 1 ||
-            isEvaluating
+            isEvaluating ||
+            !hasAnsweredCurrentQuestion
           }
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3 font-medium text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
         >

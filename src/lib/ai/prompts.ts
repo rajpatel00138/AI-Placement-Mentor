@@ -22,21 +22,21 @@ IMPORTANT RULES:
 - Do NOT use \`\`\`json.
 - Do NOT include explanations before or after the JSON.
 - Every score must be between 0 and 100.
-- Strengths, weaknesses and recommendations must be arrays of strings.
+- Strengths, weaknesses and recommendedTopics must be arrays of strings.
 
 Return EXACTLY this JSON format:
 
 {
   "overallScore": 0,
-  "technicalScore": 0,
-  "communicationScore": 0,
-  "confidenceScore": 0,
+  "technicalKnowledge": 0,
+  "communication": 0,
+  "confidence": 0,
 
   "strengths": [],
   "weaknesses": [],
-  "recommendations": [],
+  "recommendedTopics": [],
 
-  "feedback": "",
+  "overallFeedback": "",
 
   "hiringRecommendation": "Strong Hire"
 }

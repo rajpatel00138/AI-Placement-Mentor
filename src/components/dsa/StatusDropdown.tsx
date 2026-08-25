@@ -32,30 +32,31 @@ export default function StatusDropdown({
       onChange={(e) =>
         onChange(e.target.value as ProblemStatus)
       }
+      aria-label="Select Problem Status"
       className="
-        h-10
-        min-w-[180px]
+        h-9
+        w-full
+        min-w-[150px]
         rounded-xl
         border
-        border-slate-700
-        bg-slate-900
-        px-4
-        text-sm
+        border-border
+        bg-base
+        px-3
+        text-xs
         font-medium
-        text-white
+        text-primary
         outline-none
         transition-all
-        focus:border-blue-500
-        focus:ring-2
-        focus:ring-blue-500/20
+        focus:border-accent
         cursor-pointer
+        shadow-sm
       "
     >
       {options.map((option) => (
         <option
           key={option.value}
           value={option.value}
-          className="bg-slate-900 text-white"
+          className="bg-surface text-primary"
         >
           {option.label}
         </option>

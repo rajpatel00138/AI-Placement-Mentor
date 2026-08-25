@@ -8,7 +8,7 @@ This folder contains reusable dashboard UI components for the AI Placement Mento
 - WeeklyChart: Shows the weekly performance trend using Recharts.
 - Checklist: Presents tasks using a reusable, prop-driven checklist UI.
 - Timeline: Displays recent activity in a vertical timeline layout.
-- InsightsPanel: Shows AI-style recommendations and insights.
+- InsightsPanel: Shows AI-style recommendedTopics and insights.
 - QuickActions: Provides shortcut actions for common dashboard tasks.
 - EmptyState: Provides a reusable placeholder for empty data views.
 - DashboardSkeleton: Renders a loading state for dashboard content.

@@ -41,6 +41,10 @@ export default function QuestionFormatSelector() {
         Question Format
       </h2>
 
+      <p className="-mt-3 mb-6 text-sm text-slate-400">
+        MCQ works best for aptitude practice.
+      </p>
+
       <div className="grid gap-4 md:grid-cols-3">
         {formats.map((format) => {
           const active = questionFormat === format.value;

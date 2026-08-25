@@ -5,7 +5,7 @@ export function InsightsPanel({ items }: { items: InsightItem[] }) {
     <div className="rounded-[24px] border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-5 shadow-[0_20px_80px_rgba(2,6,23,0.35)] backdrop-blur-xl">
       <div className="mb-4">
         <p className="text-sm text-slate-400">AI insights</p>
-        <h3 className="text-lg font-semibold text-white">Smart recommendations</h3>
+        <h3 className="text-lg font-semibold text-white">Smart recommendedTopics</h3>
       </div>
       <div className="space-y-3">
         {items.map((item) => (

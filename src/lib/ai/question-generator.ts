@@ -67,6 +67,7 @@ Return EXACTLY this format:
 
   return parsed.map((q, index) => ({
     id: index + 1,
+    type: "descriptive",
     question: q.question,
     difficulty: request.difficulty,
     expectedTime: q.expectedTime ?? 3,

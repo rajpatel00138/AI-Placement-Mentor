@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   ReactNode,
 } from "react";
 
@@ -35,7 +36,6 @@ interface DSAContextType {
     revision: keyof RevisionState
   ) => void;
 
-
   // Status
   status: StatusMap;
   updateStatus: (
@@ -61,101 +61,117 @@ interface DSAContextType {
 const DSAContext =
   createContext<DSAContextType | null>(null);
 
+// Helper to find problem metadata
+function findProblemMeta(problemId: string) {
+  for (const cat of dsaProblems) {
+    for (const grp of cat.groups) {
+      for (const p of grp.problems) {
+        if (p.id === problemId) {
+          return {
+            title: p.name,
+            difficulty: p.difficulty,
+            category: cat.name,
+          };
+        }
+      }
+    }
+  }
+  return {
+    title: problemId,
+    difficulty: "Medium",
+    category: "General",
+  };
+}
+
 export function DSAProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [revisions, setRevisions] =
-    useState<RevisionMap>({});
+  const [revisions, setRevisions] = useState<RevisionMap>({});
+  const [status, setStatus] = useState<StatusMap>({});
+  const [favorites, setFavorites] = useState<FavoriteMap>({});
 
-  const [status, setStatus] =
-    useState<StatusMap>({});
-
-  const [favorites, setFavorites] =
-    useState<FavoriteMap>({});
-
-  // Load Local Storage
+  // 1. Load Solves from Backend (Single Source of Truth)
   useEffect(() => {
-    const savedRevisions =
-      localStorage.getItem("dsa-revisions");
-
-    if (savedRevisions) {
-      setRevisions(JSON.parse(savedRevisions));
+    async function loadBackendSolves() {
+      try {
+        const res = await fetch("/api/user/dsa");
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json.solves)) {
+            const initialStatus: StatusMap = {};
+            json.solves.forEach((id: string) => {
+              initialStatus[id] = "completed";
+            });
+            setStatus((prev) => ({ ...prev, ...initialStatus }));
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load backend DSA solves:", err);
+      }
     }
 
-    const savedStatus =
-      localStorage.getItem("dsa-status");
-
-    if (savedStatus) {
-      setStatus(JSON.parse(savedStatus));
-    }
-
-    const savedFavorites =
-      localStorage.getItem("dsa-favorites");
-
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
+    loadBackendSolves();
   }, []);
 
-  // Save Revisions
-  useEffect(() => {
-    localStorage.setItem(
-      "dsa-revisions",
-      JSON.stringify(revisions)
-    );
-  }, [revisions]);
-
-  // Save Status
-  useEffect(() => {
-    localStorage.setItem(
-      "dsa-status",
-      JSON.stringify(status)
-    );
-  }, [status]);
-
-  // Save Favorites
-  useEffect(() => {
-    localStorage.setItem(
-      "dsa-favorites",
-      JSON.stringify(favorites)
-    );
-  }, [favorites]);
-
-  // Update Revision
-  const toggleRevision = (
-  problemId: string,
-  revision: keyof RevisionState
-) => {
-  setRevisions((prev) => {
-    const current =
-      prev[problemId] ?? {
-        r1: false,
-        r2: false,
-        r3: false,
-        r4: false,
-      };
-
-    return {
-      ...prev,
-      [problemId]: {
-        ...current,
-        [revision]: !current[revision],
-      },
-    };
-  });
-};
-
-  // Update Status
-  const updateStatus = (
+  // 2. Update Status & Sync to Backend + Reactive Event
+  const updateStatus = useCallback((
     problemId: string,
-    status: ProblemStatus
+    newStatus: ProblemStatus
   ) => {
     setStatus((prev) => ({
       ...prev,
-      [problemId]: status,
+      [problemId]: newStatus,
     }));
+
+    const meta = findProblemMeta(problemId);
+    const isSolved = newStatus === "completed";
+
+    fetch("/api/user/dsa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        problemId,
+        difficulty: meta.difficulty,
+        category: meta.category,
+        problemTitle: meta.title,
+        isSolved,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          // Dispatch reactive update event to refresh Dashboard metrics without page reload
+          window.dispatchEvent(new Event("activityUpdated"));
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to sync DSA solve with backend:", err);
+      });
+  }, []);
+
+  // Toggle Revision
+  const toggleRevision = (
+    problemId: string,
+    revision: keyof RevisionState
+  ) => {
+    setRevisions((prev) => {
+      const current =
+        prev[problemId] ?? {
+          r1: false,
+          r2: false,
+          r3: false,
+          r4: false,
+        };
+
+      return {
+        ...prev,
+        [problemId]: {
+          ...current,
+          [revision]: !current[revision],
+        },
+      };
+    });
   };
 
   // Toggle Favorite
@@ -199,8 +215,7 @@ export function DSAProvider({
     inProgressProblems;
 
   // Solved = Completed
-  const solvedProblems =
-    completedProblems;
+  const solvedProblems = completedProblems;
 
   // Progress
   const progress =
@@ -238,14 +253,11 @@ export function DSAProvider({
 }
 
 export function useDSAContext() {
-  const context =
-    useContext(DSAContext);
-
+  const context = useContext(DSAContext);
   if (!context) {
     throw new Error(
       "useDSAContext must be used inside DSAProvider"
     );
   }
-
   return context;
 }

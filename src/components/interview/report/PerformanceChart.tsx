@@ -24,15 +24,15 @@ export default function PerformanceChart() {
     },
     {
       round: "Technical",
-      score: evaluation?.technicalScore ?? 0,
+      score: evaluation?.technicalKnowledge ?? 0,
     },
     {
       round: "Communication",
-      score: evaluation?.communicationScore ?? 0,
+      score: evaluation?.communication ?? 0,
     },
     {
       round: "Confidence",
-      score: evaluation?.confidenceScore ?? 0,
+      score: evaluation?.confidence ?? 0,
     },
   ];
 

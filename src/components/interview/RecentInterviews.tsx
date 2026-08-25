@@ -43,85 +43,87 @@ const interviews = [
 
 export default function RecentInterviews() {
   return (
-    <section className="space-y-6">
+    <section className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-primary">
             Recent Interviews
           </h2>
 
-          <p className="mt-2 text-slate-400">
+          <p className="mt-1 text-sm text-muted">
             Continue your interview preparation or review previous sessions.
           </p>
         </div>
 
-        <button className="rounded-xl border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-violet-500 hover:text-white">
+        <button className="rounded-xl border border-border bg-base px-4 py-2 text-xs font-semibold text-primary transition hover:bg-soft">
           View All
         </button>
       </div>
 
-      <div className="space-y-4">
-        {interviews.map((item) => (
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+        {interviews.map((item, index) => (
           <div
             key={item.id}
-            className="group rounded-3xl border border-slate-800 bg-slate-900/70 p-6 transition-all duration-300 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/10"
+            className={`flex flex-col gap-4 p-5 transition hover:bg-soft/40 lg:flex-row lg:items-center lg:justify-between ${
+              index !== interviews.length - 1
+                ? "border-b border-border"
+                : ""
+            }`}
           >
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-xl font-semibold text-white">
-                    {item.title}
-                  </h3>
+            {/* Left */}
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h3 className="text-base font-bold text-primary">
+                  {item.title}
+                </h3>
 
-                  <span className="rounded-full bg-violet-500/15 px-3 py-1 text-xs font-medium text-violet-300">
-                    {item.company}
-                  </span>
+                <span className="rounded-full bg-soft border border-border px-2.5 py-0.5 text-xs font-semibold text-primary">
+                  {item.company}
+                </span>
 
-                  <span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-300">
-                    {item.difficulty}
-                  </span>
-                </div>
-
-                <div className="mt-4 flex flex-wrap gap-6 text-sm text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={16} />
-                    {item.date}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Clock3 size={16} />
-                    {item.duration}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2
-                      size={16}
-                      className="text-green-400"
-                    />
-                    {item.status}
-                  </div>
-                </div>
+                <span className="rounded-full bg-base border border-border px-2.5 py-0.5 text-xs text-muted">
+                  {item.difficulty}
+                </span>
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-sm text-slate-400">
-                    Score
-                  </p>
+              <div className="mt-2.5 flex flex-wrap gap-4 text-xs text-muted">
+                <span className="flex items-center gap-1.5">
+                  <Calendar size={14} className="text-muted" />
+                  {item.date}
+                </span>
 
-                  <h2 className="text-3xl font-bold text-white">
-                    {item.score}
-                  </h2>
-                </div>
+                <span className="flex items-center gap-1.5">
+                  <Clock3 size={14} className="text-muted" />
+                  {item.duration}
+                </span>
 
-                <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-3 font-medium text-white transition hover:scale-105">
-                  <PlayCircle size={18} />
-                  {item.status === "Continue"
-                    ? "Continue"
-                    : "Review"}
-                  <ArrowRight size={16} />
-                </button>
+                <span className="flex items-center gap-1.5 text-success font-medium">
+                  <CheckCircle2
+                    size={14}
+                    className="text-success"
+                  />
+                  {item.status}
+                </span>
               </div>
+            </div>
+
+            {/* Right */}
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <p className="text-xs uppercase tracking-wider text-muted font-medium">
+                  Score
+                </p>
+
+                <h2 className="text-xl font-bold text-primary">
+                  {item.score}
+                </h2>
+              </div>
+
+              <button className="flex items-center gap-1.5 rounded-xl bg-accent hover:bg-accent-hover px-4 py-2 text-xs font-semibold text-on-accent shadow-sm transition hover:scale-105">
+                <PlayCircle size={15} />
+                <span>{item.status === "Continue" ? "Continue" : "Review"}</span>
+                <ArrowRight size={14} />
+              </button>
             </div>
           </div>
         ))}

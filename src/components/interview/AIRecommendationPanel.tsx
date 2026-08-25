@@ -10,98 +10,95 @@ import {
 
 export default function AIRecommendationPanel() {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-600/15 via-slate-900 to-slate-950 p-8">
+    <section className="relative overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-8 shadow-sm">
+      {/* Background Subtle Glows */}
+      <div className="absolute -right-24 -top-24 h-60 w-60 rounded-full bg-accent/5 blur-3xl" />
+      <div className="absolute -left-24 -bottom-24 h-60 w-60 rounded-full bg-accent-secondary/5 blur-3xl" />
 
-      <div className="absolute -right-24 -top-24 h-60 w-60 rounded-full bg-violet-600/20 blur-3xl" />
-      <div className="absolute -left-24 -bottom-24 h-60 w-60 rounded-full bg-cyan-500/10 blur-3xl" />
-
-      <div className="relative grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
-
+      <div className="relative grid gap-8 lg:grid-cols-[1.3fr_0.9fr] lg:items-center">
         {/* Left */}
         <div>
-
-          <div className="inline-flex items-center gap-2 rounded-full bg-violet-500/15 px-4 py-2 text-sm font-medium text-violet-300">
-            <Sparkles size={16} />
-            AI Recommendation
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-soft px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+            <Sparkles size={14} className="text-accent" />
+            <span>AI Recommendation</span>
           </div>
 
-          <h2 className="mt-5 text-3xl font-bold text-white">
+          <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-primary">
             Your next recommended interview
           </h2>
 
-          <p className="mt-4 max-w-2xl leading-7 text-slate-400">
-            Based on your DSA progress, interview history and weak topics,
-            our AI recommends practicing a Technical Interview focused on
-            Arrays, Dynamic Programming and DBMS.
+          <p className="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-muted">
+            Based on your DSA diagnostic, interview performance history and detected weak topics,
+            our AI recommends practicing a Technical Mock Interview focused on
+            Arrays, Dynamic Programming and DBMS normalization.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
-
-            <button className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 font-semibold text-white transition hover:scale-105">
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button className="rounded-2xl bg-accent hover:bg-accent-hover px-6 py-3 text-sm font-semibold text-on-accent shadow-sm transition hover:scale-[1.02] active:scale-[0.98]">
               Start AI Interview
             </button>
 
-            <button className="rounded-xl border border-slate-700 px-6 py-3 font-semibold text-slate-300 transition hover:border-violet-500 hover:text-white">
+            <button className="rounded-2xl border border-border bg-base px-6 py-3 text-sm font-semibold text-primary transition hover:bg-soft">
               View Learning Plan
             </button>
-
           </div>
-
         </div>
 
-        {/* Right */}
-        <div className="space-y-4">
-
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+        {/* Right Recommended Targets */}
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-border bg-elevated p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <Brain className="text-violet-400" />
+              <div className="rounded-xl border border-border bg-soft p-2.5 text-accent">
+                <Brain className="h-5 w-5" />
+              </div>
               <div>
-                <p className="text-white font-semibold">
-                  Technical Interview
+                <p className="text-sm font-bold text-primary">
+                  Technical Mock Interview
                 </p>
-                <p className="text-sm text-slate-400">
-                  Recommended Today
+                <p className="text-xs text-muted">
+                  Recommended Today based on diagnostic
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <div className="rounded-2xl border border-border bg-elevated p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              <Target className="text-cyan-400" />
+              <div className="rounded-xl border border-warning/30 bg-warning/15 p-2.5 text-warning">
+                <Target className="h-5 w-5" />
+              </div>
               <div>
-                <p className="text-white font-semibold">
-                  Weak Areas
+                <p className="text-sm font-bold text-primary">
+                  Focus Weak Areas
                 </p>
-                <p className="text-sm text-slate-400">
-                  Arrays • DP • DBMS
+                <p className="text-xs text-muted">
+                  Arrays • DP • DBMS Queries
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <div className="rounded-2xl border border-border bg-elevated p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <TrendingUp className="text-green-400" />
+                <div className="rounded-xl border border-success/30 bg-success/15 p-2.5 text-success">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
                 <div>
-                  <p className="font-semibold text-white">
+                  <p className="text-sm font-bold text-primary">
                     Estimated Improvement
                   </p>
-                  <p className="text-sm text-slate-400">
-                    +12% readiness
+                  <p className="text-xs text-success font-semibold">
+                    +12% Readiness Gain
                   </p>
                 </div>
               </div>
 
-              <ArrowRight className="text-violet-400" />
+              <ArrowRight className="h-4 w-4 text-muted" />
             </div>
           </div>
-
         </div>
-
       </div>
-
     </section>
   );
 }

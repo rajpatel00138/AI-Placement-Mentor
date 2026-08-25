@@ -14,40 +14,31 @@ export default function RoadmapCard({
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ duration: 0.25 }}
-      className="rounded-3xl border border-slate-700 bg-slate-900/80 p-6 shadow-xl backdrop-blur-xl"
+      className="rounded-3xl border border-border bg-surface p-6 shadow-sm backdrop-blur-xl"
     >
       <div className="flex items-center gap-3">
-
-        <div className="rounded-xl bg-cyan-500/10 p-3">
-          <Rocket className="h-6 w-6 text-cyan-400" />
+        <div className="rounded-xl border border-border bg-soft p-3 text-accent">
+          <Rocket className="h-6 w-6 text-accent" />
         </div>
 
         <div>
-
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-primary">
             AI Career Roadmap
           </h2>
 
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted">
             Follow these steps to become placement ready
           </p>
-
         </div>
-
       </div>
 
-      <div className="relative mt-10">
-
+      <div className="relative mt-8">
         {/* Vertical Line */}
+        <div className="absolute left-5 top-0 h-full w-0.5 rounded-full bg-border" />
 
-        <div className="absolute left-5 top-0 h-full w-1 rounded-full bg-gradient-to-b from-cyan-500 via-indigo-500 to-purple-500" />
-
-        <div className="space-y-8">
-
+        <div className="space-y-6">
           {suggestions.length > 0 ? (
-
             suggestions.map((item, index) => (
-
               <motion.div
                 key={index}
                 initial={{
@@ -61,45 +52,30 @@ export default function RoadmapCard({
                 transition={{
                   delay: index * 0.08,
                 }}
-                className="relative flex gap-5"
+                className="relative flex gap-4"
               >
-
-                <div className="z-10 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-indigo-500 font-bold text-white shadow-lg">
-
+                <div className="z-10 flex h-10 w-10 items-center justify-center rounded-full bg-accent font-bold text-on-accent shadow-sm">
                   {index + 1}
-
                 </div>
 
-                <div className="flex-1 rounded-2xl border border-slate-700 bg-slate-800/70 p-5">
-
-                  <h3 className="font-semibold text-white">
+                <div className="flex-1 rounded-2xl border border-border bg-elevated p-5 shadow-sm">
+                  <h3 className="font-semibold text-primary">
                     Step {index + 1}
                   </h3>
 
-                  <p className="mt-2 leading-7 text-slate-300">
+                  <p className="mt-1.5 leading-6 text-sm text-muted">
                     {item}
                   </p>
-
                 </div>
-
               </motion.div>
-
             ))
-
           ) : (
-
-            <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 text-green-400">
-
+            <div className="rounded-2xl border border-success/30 bg-success/10 p-5 text-sm font-medium text-success">
               🎉 Congratulations! Your roadmap is complete.
-
             </div>
-
           )}
-
         </div>
-
       </div>
-
     </motion.div>
   );
 }

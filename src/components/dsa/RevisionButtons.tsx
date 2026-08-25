@@ -27,11 +27,11 @@ export default function RevisionButtons({
 }: RevisionButtonsProps) {
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden text-sm font-medium text-slate-400 md:block">
+      <span className="hidden text-xs font-semibold uppercase tracking-wider text-muted md:block">
         Revision
       </span>
 
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         {buttons.map((key, index) => {
           const completed = revision[key];
 
@@ -41,22 +41,22 @@ export default function RevisionButtons({
               onClick={() => onToggle(key)}
               title={`Revision ${index + 1}`}
               className={`
-                flex h-10 min-w-[52px] items-center justify-center
-                rounded-xl border px-3
-                text-sm font-semibold
+                flex h-9 min-w-[48px] items-center justify-center
+                rounded-xl border px-2.5
+                text-xs font-bold
                 transition-all duration-200
                 hover:scale-105 active:scale-95
 
                 ${
                   completed
-                    ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                    : "border-slate-700 bg-slate-900 text-slate-400 hover:border-blue-500 hover:text-white hover:bg-slate-800"
+                    ? "border-success bg-success text-on-accent shadow-sm"
+                    : "border-border bg-base text-muted hover:border-accent hover:text-primary hover:bg-soft"
                 }
               `}
             >
               {completed ? (
                 <div className="flex items-center gap-1">
-                  <Check size={14} />
+                  <Check size={13} />
                   <span>R{index + 1}</span>
                 </div>
               ) : (

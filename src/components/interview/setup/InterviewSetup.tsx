@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
+
 import {
   Brain,
-  Clock3,
-  Building2,
   Languages,
   ListChecks,
 } from "lucide-react";
@@ -14,8 +14,21 @@ import CompanySelector from "./CompanySelector";
 import DurationSelector from "./DurationSelector";
 import StartButton from "./StartButton";
 import QuestionFormatSelector from "./QuestionFormatSelector";
+import { useInterview, type InterviewType } from "@/context/InterviewContext";
 
-export default function InterviewSetup() {
+export default function InterviewSetup({
+  initialInterviewType,
+}: {
+  initialInterviewType?: InterviewType;
+}) {
+  const { setInterviewType } = useInterview();
+
+  useEffect(() => {
+    if (initialInterviewType) {
+      setInterviewType(initialInterviewType);
+    }
+  }, [initialInterviewType, setInterviewType]);
+
   return (
     <div className="space-y-8">
 
@@ -35,7 +48,7 @@ export default function InterviewSetup() {
         <p className="mt-4 max-w-3xl text-slate-400">
           Choose interview type, company, duration and difficulty.
           Our AI will generate personalized interview questions and
-          provide detailed feedback after the session.
+          provide detailed overallFeedback after the session.
         </p>
 
       </section>

@@ -14,30 +14,25 @@ export default function StrengthCard({
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ duration: 0.25 }}
-      className="rounded-3xl border border-slate-700 bg-slate-900/80 p-6 shadow-xl backdrop-blur-xl"
+      className="rounded-3xl border border-border bg-surface p-6 shadow-sm backdrop-blur-xl"
     >
       <div className="flex items-center gap-3">
-
-        <div className="rounded-xl bg-emerald-500/10 p-3">
-          <Trophy className="h-6 w-6 text-emerald-400" />
+        <div className="rounded-xl border border-success/30 bg-success/10 p-3 text-success">
+          <Trophy className="h-6 w-6 text-success" />
         </div>
 
         <div>
-
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-primary">
             Strengths
           </h2>
 
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted">
             Areas where your resume performs well
           </p>
-
         </div>
-
       </div>
 
-      <div className="mt-8 space-y-4">
-
+      <div className="mt-8 space-y-3">
         {strengths.length > 0 ? (
           strengths.map((item, index) => (
             <motion.div
@@ -45,23 +40,22 @@ export default function StrengthCard({
               initial={{ opacity: 0, x: -15 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.08 }}
-              className="flex items-start gap-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4"
+              className="flex items-start gap-3.5 rounded-2xl border border-success/30 bg-success/10 p-4"
             >
-              <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">
+              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success text-xs font-bold text-on-accent">
                 ✓
               </div>
 
-              <p className="text-slate-200">
+              <p className="text-sm font-medium text-primary">
                 {item}
               </p>
             </motion.div>
           ))
         ) : (
-          <p className="text-slate-500">
+          <p className="text-sm text-muted">
             No strengths identified.
           </p>
         )}
-
       </div>
     </motion.div>
   );

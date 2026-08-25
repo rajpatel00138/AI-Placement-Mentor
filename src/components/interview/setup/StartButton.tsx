@@ -46,10 +46,18 @@ export default function StartButton() {
         }),
       });
 
-      const data = await response.json();
+      const data: {
+        success?: boolean;
+        error?: string;
+        questions?: unknown;
+      } = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message);
+        throw new Error(data.error ?? "Question generation failed.");
+      }
+
+      if (!Array.isArray(data.questions)) {
+        throw new Error("The server returned an invalid list of questions.");
       }
 
       const questions = data.questions.map(
@@ -90,7 +98,11 @@ export default function StartButton() {
     } catch (error) {
       console.error(error);
 
-      alert("Unable to generate interview questions.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Unable to generate interview questions."
+      );
     } finally {
       setLoading(false);
     }

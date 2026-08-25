@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({
 });
 
 const MODEL =
-  process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite";
+  process.env.GEMINI_MODEL ?? "gemini-3.1-flash-lite";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,77 +18,52 @@ export async function POST(req: NextRequest) {
       questionFormat = "descriptive",
       numberOfQuestions = 5,
     } = await req.json();
+    const aptitudeInstructions =
+      interviewType === "aptitude"
+        ? `
+    This is a placement aptitude round. Cover a balanced mix of quantitative aptitude,
+    logical reasoning, data interpretation, and verbal ability. Use realistic campus
+    placement-test wording. For MCQs, provide four plausible options and exactly one
+    unambiguous correct answer. Do calculations carefully before returning the answer.
+    `
+        : "";
     const prompt = `
-You are a Senior Software Engineering Interviewer.
+    Generate exactly ${numberOfQuestions} ${difficulty} ${interviewType} interview questions.
 
-Generate exactly ${numberOfQuestions} interview questions.
+    Company: ${company}
+    Language: ${language}
+    Format: ${questionFormat}
+    ${aptitudeInstructions}
 
-Interview Type:
-${interviewType}
+    Return ONLY a valid JSON array.
 
-Difficulty:
-${difficulty}
+    For descriptive:
+    {
+      "type":"descriptive",
+      "question":"",
+      "expectedTime":3
+    }
 
-Company:
-${company}
-
-Language:
-${language}
-
-Question Format:
-${questionFormat}
-
-Rules:
-
-- Return ONLY valid JSON.
-- Do NOT return markdown.
-- Do NOT wrap inside \`\`\`.
-- expectedTime must be an integer.
-
-Question Format Rules:
-
-1. If questionFormat = "descriptive"
-
-Return ONLY descriptive questions.
-
-Each object:
-
-{
-  "type":"descriptive",
-  "question":"",
-  "expectedTime":3
-}
-
-2. If questionFormat = "mcq"
-
-Return ONLY MCQs.
-
-Each object:
-
-{
-  "type":"mcq",
-  "question":"",
-  "options":[
-    "",
-    "",
-    "",
-    ""
-  ],
-  "correctAnswer":"",
-  "explanation":"",
-  "expectedTime":2
-}
-
-3. If questionFormat = "mixed"
-
-Generate a balanced mix of descriptive and MCQ questions.
-
-Return ONLY JSON array.
-`;
-
+    For mcq:
+    {
+      "type":"mcq",
+      "question":"",
+      "options":["","","",""],
+      "correctAnswer":"",
+      "explanation":"",
+      "expectedTime":2
+    }
+    `;
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
+      config: {
+        temperature: 0.7,
+        responseMimeType: "application/json",
+        // Five MCQs with answers and explanations exceed 500 tokens and the
+        // resulting truncated JSON prevents an interview from starting.
+        maxOutputTokens: 4096,
+      },
     });
 
     const text = response.text?.trim();
@@ -110,6 +85,10 @@ Return ONLY JSON array.
       throw new Error(
         `Gemini returned invalid JSON:\n\n${cleaned}`
       );
+    }
+
+    if (!Array.isArray(questions) || questions.length === 0) {
+      throw new Error("Gemini did not return a valid list of interview questions.");
     }
 
     return NextResponse.json({

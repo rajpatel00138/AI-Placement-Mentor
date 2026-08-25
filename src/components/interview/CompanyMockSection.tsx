@@ -14,42 +14,36 @@ const companies = [
     difficulty: "hard",
     duration: "60 min",
     questions: 25,
-    color: "from-blue-500/20 to-cyan-500/10",
   },
   {
     name: "Amazon",
     difficulty: "medium",
     duration: "45 min",
     questions: 20,
-    color: "from-orange-500/20 to-yellow-500/10",
   },
   {
     name: "Microsoft",
     difficulty: "hard",
     duration: "60 min",
     questions: 25,
-    color: "from-green-500/20 to-emerald-500/10",
   },
   {
     name: "Zoho",
     difficulty: "medium",
     duration: "40 min",
     questions: 18,
-    color: "from-red-500/20 to-pink-500/10",
   },
   {
     name: "Infosys",
     difficulty: "easy",
     duration: "30 min",
     questions: 15,
-    color: "from-indigo-500/20 to-blue-500/10",
   },
   {
     name: "TCS",
     difficulty: "easy",
     duration: "30 min",
     questions: 15,
-    color: "from-slate-500/20 to-slate-700/10",
   },
 ];
 
@@ -59,46 +53,52 @@ export default function CompanyMockSection() {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-primary">
           Company Mock Interviews
         </h2>
 
-        <p className="mt-2 text-slate-400">
-          Practice company-specific interview rounds with AI-powered feedback.
+        <p className="mt-1 text-sm text-muted">
+          Practice company-specific interview rounds with AI-powered diagnostic feedback.
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {companies.map((company) => (
           <div
             key={company.name}
-            className={`group rounded-3xl border border-slate-800 bg-gradient-to-br ${company.color} p-6 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-xl hover:shadow-violet-500/10`}
+            className="group rounded-3xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
           >
-            <div className="flex items-center gap-4">
-              <div className="rounded-2xl bg-white/10 p-3">
-                <Building2 className="text-white" size={26} />
+            <div className="flex items-center gap-3.5">
+              <div className="rounded-2xl border border-border bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
+                <Building2 size={24} />
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-lg font-bold text-primary">
                   {company.name}
                 </h3>
 
-                <p className="text-sm text-slate-300 capitalize">
-                  {company.difficulty} Level
-                </p>
+                <span className={`inline-block rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${
+                  company.difficulty === "hard"
+                    ? "bg-error/15 text-error border border-error/30"
+                    : company.difficulty === "medium"
+                    ? "bg-warning/15 text-warning border border-warning/30"
+                    : "bg-success/15 text-success border border-success/30"
+                }`}>
+                  {company.difficulty}
+                </span>
               </div>
             </div>
 
-            <div className="mt-6 space-y-3 text-sm text-slate-300">
+            <div className="mt-5 space-y-2.5 text-xs font-medium text-muted">
               <div className="flex items-center gap-2">
-                <Clock3 size={16} />
-                {company.duration}
+                <Clock3 size={15} className="text-muted" />
+                <span>{company.duration} Duration</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <BarChart3 size={16} />
-                {company.questions} Questions
+                <BarChart3 size={15} className="text-muted" />
+                <span>{company.questions} Questions</span>
               </div>
             </div>
 
@@ -110,10 +110,10 @@ export default function CompanyMockSection() {
                   )}&difficulty=${company.difficulty}`
                 )
               }
-              className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white transition-all hover:bg-violet-500"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-accent hover:bg-accent-hover px-4 py-2.5 text-xs font-semibold text-on-accent shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              Start Mock
-              <ArrowRight size={18} />
+              <span>Start Mock</span>
+              <ArrowRight size={15} />
             </button>
           </div>
         ))}

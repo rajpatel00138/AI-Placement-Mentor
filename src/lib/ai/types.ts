@@ -5,7 +5,8 @@ export type InterviewType =
   | "dbms"
   | "os"
   | "cn"
-  | "system-design";
+  | "system-design"
+  | "aptitude";
 
 export type Difficulty =
   | "easy"
@@ -26,19 +27,39 @@ export interface InterviewEvaluationRequest {
 
 export interface InterviewEvaluationResponse {
   overallScore: number;
-  technicalScore: number;
-  communicationScore: number;
-  confidenceScore: number;
+
+  communication: number;
+  technicalKnowledge: number;
+  problemSolving: number;
+  confidence: number;
 
   strengths: string[];
   weaknesses: string[];
-  recommendations: string[];
 
-  feedback: string;
+  overalloverallFeedback: string;
 
-  hiringRecommendation:
-    | "Strong Hire"
-    | "Hire"
-    | "Borderline"
-    | "No Hire";
+  hiringRecommendation: {
+    status:
+      | "Strong Hire"
+      | "Hire"
+      | "Lean Hire"
+      | "No Hire";
+
+    confidence:
+      | "High"
+      | "Medium"
+      | "Low";
+
+    reason: string;
+  };
+
+  recommendedTopics: {
+    topic: string;
+    priority:
+      | "High"
+      | "Medium"
+      | "Low";
+  }[];
+
+  suggestions: string[];
 }

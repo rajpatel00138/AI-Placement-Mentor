@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Brain, FileText, Target, TrendingUp, Trophy } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { FileText, Target, TrendingUp, Trophy, Sparkles } from "lucide-react";
 import {
   AIInsightCard,
-  DashboardGrid,
-  DashboardHeader,
   LoadingSkeleton,
-  ProgressChart,
+  MomentumGauge,
   QuickActions,
   RecentActivity,
   StatCard,
@@ -15,100 +14,126 @@ import {
   WeakTopics,
   WelcomeBanner,
 } from "@/components/dashboard";
-
-const statCards = [
-  {
-    title: "Placement Readiness",
-    value: "87%",
-    detail: "Momentum is strong this month",
-    trend: "+8% from last week",
-    accent: "bg-emerald-500/15 text-emerald-300",
-    icon: <Target className="h-5 w-5" />,
-  },
-  {
-    title: "Resume ATS Score",
-    value: "82/100",
-    detail: "Keyword density looks solid",
-    trend: "+5 points this week",
-    accent: "bg-indigo-500/15 text-indigo-300",
-    icon: <FileText className="h-5 w-5" />,
-  },
-  {
-    title: "DSA Progress",
-    value: "145 / 455",
-    detail: "Steady growth across arrays and trees",
-    trend: "12 more problems this month",
-    accent: "bg-cyan-500/15 text-cyan-300",
-    icon: <TrendingUp className="h-5 w-5" />,
-  },
-  {
-    title: "Interview Score",
-    value: "78%",
-    detail: "Confidence is improving quickly",
-    trend: "Communication +7%",
-    accent: "bg-amber-500/15 text-amber-300",
-    icon: <Trophy className="h-5 w-5" />,
-  },
-];
-
-const weeklyData = [
-  { day: "Mon", score: 62 },
-  { day: "Tue", score: 68 },
-  { day: "Wed", score: 72 },
-  { day: "Thu", score: 76 },
-  { day: "Fri", score: 81 },
-  { day: "Sat", score: 85 },
-  { day: "Sun", score: 88 },
-];
-
-const weakTopics = [
-  { label: "Arrays", value: 72, detail: "Good control with medium-level questions" },
-  { label: "Trees", value: 64, detail: "Needs more recursive practice" },
-  { label: "Graphs", value: 58, detail: "Revise traversals and shortest paths" },
-  { label: "DP", value: 49, detail: "Revisit state transition patterns" },
-  { label: "Heap", value: 53, detail: "Practice priority queue usage" },
-];
-
-const tasks = [
-  { id: "1", title: "Solve 5 DSA Questions", done: true, due: "09:00" },
-  { id: "2", title: "Upload Resume", done: false, due: "12:30" },
-  { id: "3", title: "Complete Mock Interview", done: false, due: "18:00" },
-  { id: "4", title: "Revise Graphs", done: false, due: "20:00" },
-];
-
-const activityFeed = [
-  { id: "1", title: "Resume Uploaded", time: "10 min ago", type: "Resume" },
-  { id: "2", title: "Interview Completed", time: "1 hr ago", type: "Mock Interview" },
-  { id: "3", title: "DSA Solved", time: "3 hrs ago", type: "Practice" },
-  { id: "4", title: "ATS Improved", time: "Today", type: "Resume" },
-];
+import { UserPerformanceMetrics } from "@/lib/activity/service";
 
 const quickActions = [
-  { label: "Upload Resume", hint: "Add latest version" },
-  { label: "Start Interview", hint: "Practice live" },
-  { label: "Open DSA Tracker", hint: "See recent solves" },
-  { label: "Ask AI Mentor", hint: "Get guidance" },
+  { label: "Upload Resume", hint: "Add latest version", href: "/dashboard/resume" },
+  { label: "Start Interview", hint: "Practice live", href: "/dashboard/interview" },
+  { label: "Open DSA Tracker", hint: "See recent solves", href: "/dashboard/dsa-tracker" },
+  { label: "View Roadmap", hint: "Track milestones", href: "/dashboard/roadmap" },
 ];
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
+  const [metrics, setMetrics] = useState<UserPerformanceMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setIsLoading(false), 500);
-    return () => window.clearTimeout(timer);
+  const fetchPerformance = useCallback(async () => {
+    try {
+      const res = await fetch("/api/user/performance");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data) {
+          setMetrics(json.data);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load user performance:", e);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPerformance();
+
+    // Reactive metric updates without page reload
+    const handleActivityUpdated = () => {
+      fetchPerformance();
+    };
+
+    window.addEventListener("activityUpdated", handleActivityUpdated);
+    return () => window.removeEventListener("activityUpdated", handleActivityUpdated);
+  }, [fetchPerformance]);
 
   if (isLoading) {
     return <LoadingSkeleton />;
   }
 
+  const studentName = session?.user?.name || "Student";
+  const readiness = metrics?.readinessScore ?? 0;
+  const placementProb = metrics?.placementProbability ?? 0;
+  const dsaCount = metrics?.dsaSolvedCount ?? 0;
+  const dsaScore = metrics?.dsaScore ?? 0;
+  const resumeScore = metrics?.resumeScore ?? 0;
+  const interviewScore = metrics?.interviewScore ?? 0;
+  const interviewCount = metrics?.mockInterviewsCount ?? 0;
+  const roadmapProgress = metrics?.roadmapProgress ?? 0;
+  const activities = metrics?.recentActivities ?? [];
+
+  const statCards = [
+    {
+      title: "Placement Readiness",
+      value: `${readiness}%`,
+      detail: readiness === 0 ? "Start solving tasks to build score" : `Placement Probability: ${placementProb}%`,
+      trend: metrics?.readinessGain7d ? `+${metrics.readinessGain7d}% this week` : readiness > 0 ? "Active progress" : "Zero state",
+      accent: readiness >= 70 ? "bg-success/15 text-success border border-success/30" : "bg-accent/15 text-accent border border-accent/30",
+      icon: <Target className="h-5 w-5" />,
+    },
+    {
+      title: "Resume ATS Score",
+      value: resumeScore > 0 ? `${resumeScore}/100` : "0/100",
+      detail: resumeScore > 0 ? (metrics?.latestResume?.fileName || "Latest Resume") : "No resume uploaded yet",
+      trend: resumeScore > 0 ? "Verified by AI Analyzer" : "Upload to calculate",
+      accent: resumeScore >= 75 ? "bg-success/15 text-success border border-success/30" : "bg-warning/15 text-warning border border-warning/30",
+      icon: <FileText className="h-5 w-5" />,
+    },
+    {
+      title: "DSA Progress",
+      value: `${dsaCount} Solved`,
+      detail: `${dsaScore}% Mastery (${metrics?.dsaEasyCount || 0}E • ${metrics?.dsaMediumCount || 0}M • ${metrics?.dsaHardCount || 0}H)`,
+      trend: dsaCount > 0 ? "Real-time synced" : "0 problems solved",
+      accent: "bg-accent/15 text-accent border border-accent/30",
+      icon: <TrendingUp className="h-5 w-5" />,
+    },
+    {
+      title: "Interview Score",
+      value: interviewScore > 0 ? `${interviewScore}%` : "0%",
+      detail: interviewCount > 0 ? `${interviewCount} mock session${interviewCount > 1 ? "s" : ""} completed` : "No sessions yet",
+      trend: interviewCount > 0 ? "AI evaluated" : "Start a mock interview",
+      accent: interviewScore >= 75 ? "bg-success/15 text-success border border-success/30" : "bg-accent/15 text-accent border border-accent/30",
+      icon: <Trophy className="h-5 w-5" />,
+    },
+  ];
+
+  // Dynamic Focus Topics based on user progress
+  const dynamicWeakTopics = [
+    { label: "Data Structures & Algorithms", value: Math.max(10, dsaScore), detail: dsaCount > 0 ? `${dsaCount} problems solved` : "Start with Arrays & Strings" },
+    { label: "Resume ATS Optimization", value: Math.max(10, resumeScore), detail: resumeScore > 0 ? "ATS keywords verified" : "Upload your resume" },
+    { label: "Mock Technical Interview", value: Math.max(10, interviewScore), detail: interviewCount > 0 ? `${interviewCount} completed` : "Practice AI interview questions" },
+    { label: "Roadmap Milestones", value: Math.max(10, roadmapProgress), detail: `${roadmapProgress}% curriculum completed` },
+  ];
+
+  // Dynamic Actionable Tasks
+  const dynamicTasks = [
+    { id: "1", title: "Solve your next DSA challenge", done: dsaCount >= 5, due: "Daily Goal" },
+    { id: "2", title: "Analyze Resume for ATS compatibility", done: resumeScore > 0, due: "Core Target" },
+    { id: "3", title: "Complete a Technical Mock Interview", done: interviewCount > 0, due: "Weekly Target" },
+    { id: "4", title: "Check off a Roadmap Milestone", done: roadmapProgress > 0, due: "Self Paced" },
+  ];
+
+  const momentumLevel = Math.max(5, Math.min(100, readiness > 0 ? readiness : 10));
+  const greetingHour = new Date().getHours();
+  const greeting = greetingHour < 12 ? "Good morning" : greetingHour < 18 ? "Good afternoon" : "Good evening";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       <WelcomeBanner
-        greeting="Good Morning"
-        userName="Aarav"
-        message="You’re building momentum faster than ever."
-        badge="Momentum score 88/100"
+        greeting={greeting}
+        userName={studentName}
+        message={readiness === 0 ? "Welcome! Ready to start your placement preparation?" : "You're actively building real placement readiness."}
+        badge={`Readiness ${readiness}%`}
+        level={momentumLevel}
       />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -120,29 +145,30 @@ export default function DashboardPage() {
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
           <AIInsightCard
-            title="AI Mentor"
-            message="Today's Recommendation focuses on trees, SQL confidence, and refining your resume for faster shortlist conversion."
-            companies={["Zoho", "TCS", "Infosys"]}
-            recommendation={["Revise Trees", "Improve SQL", "Upload Updated Resume"]}
+            title="AI Placement Mentor"
+            message={
+              readiness === 0
+                ? "Your dashboard is freshly initialized with 0 dummy data. Begin by solving your first DSA challenge or uploading your resume to start generating your readiness score."
+                : `Your placement readiness is at ${readiness}%. Keep solving medium-level problems and complete mock interviews to boost your score above 75%.`
+            }
+            companies={["Google", "Microsoft", "Amazon", "Zoho"]}
+            recommendation={
+              readiness === 0
+                ? ["Solve 1st DSA Problem", "Upload Resume for ATS Score", "Start 1st Mock Interview"]
+                : ["Practice Hard DSA", "Target 85+ Resume ATS", "Complete System Design Roadmap"]
+            }
           />
-          <ProgressChart data={weeklyData} />
+          <MomentumGauge value={momentumLevel} label="Overall Placement Momentum" />
         </div>
         <div className="space-y-6">
-          <WeakTopics items={weakTopics} />
-          <TaskChecklist items={tasks} />
+          <WeakTopics items={dynamicWeakTopics} />
+          <TaskChecklist items={dynamicTasks} />
         </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <RecentActivity items={activityFeed} />
+        <RecentActivity items={activities} />
         <QuickActions items={quickActions} />
-      </section>
-
-      <section className="rounded-[24px] border border-white/10 bg-slate-900/70 p-6 shadow-[0_20px_80px_rgba(2,6,23,0.35)] backdrop-blur-xl">
-        <div className="flex items-center gap-3 text-sm text-slate-400">
-          <Brain className="h-4 w-4 text-indigo-300" />
-          Dashboard is API-ready and uses dummy data only.
-        </div>
       </section>
     </div>
   );

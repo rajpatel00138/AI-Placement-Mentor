@@ -1,9 +1,9 @@
-import { evaluateInterview } from "@/lib/ai/interviewEvaluator";
+import { evaluateInterview } from "@/lib/ai/interview";
 
 export async function generateInterviewReport() {
   return evaluateInterview({
-    interviewType: "Technical",
-    difficulty: "Medium",
+    interviewType: "technical",
+    difficulty: "medium",
     company: "Google",
 
     questions: [],

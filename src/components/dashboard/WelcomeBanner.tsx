@@ -6,32 +6,55 @@ export type WelcomeBannerProps = {
   userName: string;
   message: string;
   badge: string;
+  level: number; // 1-100
 };
 
-export function WelcomeBanner({ greeting, userName, message, badge }: WelcomeBannerProps) {
+export function WelcomeBanner({ greeting, userName, message, badge, level }: WelcomeBannerProps) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
-      className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,_rgba(129,140,248,0.25),_transparent_35%),linear-gradient(135deg,rgba(15,23,42,0.95),rgba(2,6,23,0.95))] p-6 shadow-[0_30px_120px_rgba(2,6,23,0.45)] backdrop-blur-xl"
+      className="rounded-[32px] border border-border bg-surface p-6 sm:p-8 shadow-sm backdrop-blur-xl relative overflow-hidden"
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-3 py-1 text-sm text-indigo-200">
-            <Sparkles className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-soft px-3 py-1 text-sm text-primary font-medium">
+            <Sparkles className="h-4 w-4 text-accent" />
             {greeting}, {userName}
           </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl">
             {message}
           </h2>
-          <p className="text-slate-300">
+          <p className="text-muted">
             A calm, modern overview of your placement prep, performance, and daily momentum.
           </p>
         </div>
-        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-slate-200">
-          <Zap className="h-4 w-4 text-amber-300" />
-          {badge}
+        <div className="flex items-center gap-4">
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            <svg className="w-full h-full -rotate-90">
+              <circle cx="24" cy="24" r="20" className="stroke-border" strokeWidth="4" fill="transparent" />
+              <motion.circle
+                cx="24"
+                cy="24"
+                r="20"
+                className="stroke-accent"
+                strokeWidth="4"
+                fill="transparent"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: level / 100 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+              />
+            </svg>
+            <span className="absolute text-xs font-bold text-primary">L{Math.floor(level/10) + 1}</span>
+          </div>
+          <div className="rounded-2xl border border-border bg-soft px-4 py-3 text-sm text-primary">
+            <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-warning" />
+                {badge}
+            </div>
+          </div>
         </div>
       </div>
     </motion.section>

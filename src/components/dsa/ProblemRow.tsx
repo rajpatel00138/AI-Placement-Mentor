@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import { Problem } from "@/types/dsa";
+import { TrackerProblem as Problem } from "@/types/dsa";
 import { useDSAContext } from "./context/DSAContext";
 import StatusDropdown from "./StatusDropdown";
 import RevisionButtons from "./RevisionButtons";
@@ -32,40 +32,38 @@ export default function ProblemRow({
     status[problem.id] ?? "not-started";
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 transition hover:border-violet-500/40">
-
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-
+    <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 shadow-sm transition hover:border-accent/40">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         {/* Left */}
         <div className="flex-1">
-
           <a
             href={problem.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-lg font-semibold text-white hover:text-violet-400"
+            className="inline-flex items-center gap-2 text-base font-bold text-primary hover:text-accent transition"
           >
-            {problem.name}
-            <ExternalLink size={16} />
+            <span>{problem.name}</span>
+            <ExternalLink size={15} className="text-muted hover:text-accent" />
           </a>
 
-          <span
-            className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-medium
-            ${
-              problem.difficulty === "Easy"
-                ? "bg-green-500/20 text-green-400"
-                : problem.difficulty === "Medium"
-                ? "bg-yellow-500/20 text-yellow-400"
-                : "bg-red-500/20 text-red-400"
-            }`}
-          >
-            {problem.difficulty}
-          </span>
-
+          <div className="mt-2">
+            <span
+              className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold
+              ${
+                problem.difficulty === "Easy"
+                  ? "bg-success/15 text-success border border-success/30"
+                  : problem.difficulty === "Medium"
+                  ? "bg-warning/15 text-warning border border-warning/30"
+                  : "bg-error/15 text-error border border-error/30"
+              }`}
+            >
+              {problem.difficulty}
+            </span>
+          </div>
         </div>
 
         {/* Status */}
-        <div className="min-w-[180px]">
+        <div className="min-w-[170px]">
           <StatusDropdown
             value={currentStatus}
             onChange={(value) =>
@@ -81,9 +79,7 @@ export default function ProblemRow({
             toggleRevision(problem.id, key)
           }
         />
-
       </div>
-
     </div>
   );
 }

@@ -9,10 +9,187 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
+
+  // Authentication
   name      String
   email     String   @unique
-  password  String
-  role      String   @default("student")
+  password  String   @default("")
+  image     String?
+  role      String   @default("student") // "student" | "recruiter"
+
+  // Personal Information
+  college           String?
+  branch            String?
+  graduationYear    Int?
+  bio               String?
+
+  // Placement Information
+  targetRole        String?
+  targetCompany     String?
+
+  // Professional Links
+  githubUrl         String?
+  linkedinUrl       String?
+  portfolioUrl      String?
+
+  // Resume
+  resumeUrl         String?
+
+  // College & Batch Relation
+  collegeId         String?
+  collegeRelation   College? @relation(fields: [collegeId], references: [id], onDelete: SetNull)
+  batch             String?
+
+  // Preferences & Settings
+  emailNotificationsEnabled Boolean @default(true)
+  dsaReminderEnabled        Boolean @default(true)
+  interviewFeedbackAlerts   Boolean @default(true)
+  themePreference           String  @default("light")
+
+  // Analytics Scores (0-100)
+  dsaScore          Int      @default(0)
+  resumeScore       Int      @default(0)
+  interviewScore    Int      @default(0)
+  codingScore       Int      @default(0)
+  aptitudeScore     Int      @default(0)
+  readinessScore    Int      @default(0)
+  placementProbability Float @default(0.0)
+
+  // Relations
+  chatSessions      ChatSession[]
+  notes             Note[]
+  activityLogs      ActivityLog[]
+  dsaSolves         DsaSolve[]
+  roadmapProgress   RoadmapProgress[]
+  interviewRecords  InterviewRecord[]
+  resumeRecords     ResumeRecord[]
+  readinessSnapshots ReadinessSnapshot[]
+
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model College {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String?  @unique
+  location    String?
+  students    User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("New Chat")
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String      // "user" | "assistant"
+  content   String
+  createdAt DateTime    @default(now())
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String   @default("Untitled Note")
+  content   String   @default("")
+  tags      String[] @default([])
+  isPinned  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+  @@index([userId, isPinned])
+}
+
+model ActivityLog {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type           String   // "DSA_PROBLEM_SOLVED", "RESUME_ANALYZED", "MOCK_INTERVIEW_COMPLETED", "ROADMAP_TOPIC_COMPLETED", "NOTE_CREATED", "CHAT_SESSION_CREATED"
+  title          String
+  detail         String?
+  readinessAfter Int?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
+}
+
+model DsaSolve {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId  String
+  difficulty String   // "Easy" | "Medium" | "Hard"
+  category   String
+  solvedAt   DateTime @default(now())
+
+  @@unique([userId, problemId])
+  @@index([userId])
+}
+
+model RoadmapProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId   String
+  topicKey   String
+  completed  Boolean  @default(true)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, courseId, topicKey])
+  @@index([userId])
+}
+
+model InterviewRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  category    String
+  difficulty  String
+  score       Int
+  durationMin Int
+  feedback    String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model ResumeRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName    String
+  atsScore    Int
+  summary     String?
+  skills      String[] @default([])
+  skillGaps   String[] @default([])
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model ReadinessSnapshot {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readinessScore Int
+  date           DateTime @default(now())
+
+  @@index([userId, date])
 }

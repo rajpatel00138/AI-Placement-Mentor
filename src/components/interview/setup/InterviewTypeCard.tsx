@@ -8,6 +8,7 @@ import {
   Cpu,
   Network,
   Boxes,
+  Calculator,
 } from "lucide-react";
 
 import {
@@ -71,6 +72,14 @@ const interviewTypes = [
     icon: Boxes,
     color: "text-yellow-400",
     bg: "bg-yellow-500/15",
+  },
+  {
+    id: "aptitude",
+    title: "Aptitude",
+    description: "Quantitative, logical & verbal ability",
+    icon: Calculator,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/15",
   },
 ];
 

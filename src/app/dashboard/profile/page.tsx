@@ -1,8 +1,15 @@
-export default function ProfilePage() {
+import { auth } from "@/auth";
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import PersonalInformation from "@/components/profile/PersonalInformation";
+
+export default async function ProfilePage() {
+  const session = await auth();
+
   return (
-    <div className="rounded-[28px] border border-white/10 bg-slate-900/80 p-10 text-center shadow-xl">
-      <h2 className="text-2xl font-semibold text-white">Profile</h2>
-      <p className="mt-3 text-slate-400">Coming Soon</p>
+    <div className="space-y-8">
+      <ProfileHeader user={session?.user} />
+
+      <PersonalInformation user={session?.user} />
     </div>
   );
 }

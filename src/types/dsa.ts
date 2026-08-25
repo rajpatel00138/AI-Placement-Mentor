@@ -50,3 +50,5 @@ export interface Category {
   name: string;
   groups: ProblemGroup[];
 }
+
+export type ProgressMap = Record<string, boolean>;

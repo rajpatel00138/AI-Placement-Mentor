@@ -11,100 +11,80 @@ import {
 const stats = [
   {
     title: "Mock Interviews",
-    value: "0",
-    subtitle: "Completed",
+    value: "12",
+    subtitle: "Completed Sessions",
     icon: Mic,
-    gradient:
-      "from-violet-500/20 to-fuchsia-500/10",
-    iconBg:
-      "bg-violet-500/20",
-    iconColor:
-      "text-violet-400",
+    iconBg: "bg-accent/15 border border-accent/30",
+    iconColor: "text-accent",
   },
   {
     title: "Best Score",
-    value: "0%",
+    value: "92%",
     subtitle: "Highest Performance",
     icon: Trophy,
-    gradient:
-      "from-amber-500/20 to-orange-500/10",
-    iconBg:
-      "bg-amber-500/20",
-    iconColor:
-      "text-amber-400",
+    iconBg: "bg-success/15 border border-success/30",
+    iconColor: "text-success",
   },
   {
     title: "Current Streak",
-    value: "0",
-    subtitle: "Days",
+    value: "8",
+    subtitle: "Active Days",
     icon: Flame,
-    gradient:
-      "from-rose-500/20 to-red-500/10",
-    iconBg:
-      "bg-rose-500/20",
-    iconColor:
-      "text-rose-400",
+    iconBg: "bg-warning/15 border border-warning/30",
+    iconColor: "text-warning",
   },
   {
-    title: "AI Feedback",
+    title: "AI Mentor Status",
     value: "Ready",
-    subtitle: "Gemini Powered",
+    subtitle: "Gemini 2.5 Flash",
     icon: Brain,
-    gradient:
-      "from-cyan-500/20 to-sky-500/10",
-    iconBg:
-      "bg-cyan-500/20",
-    iconColor:
-      "text-cyan-400",
+    iconBg: "bg-success/15 border border-success/30",
+    iconColor: "text-success",
   },
 ];
 
 export default function StatsCards() {
   return (
-    <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((card) => {
         const Icon = card.icon;
 
         return (
           <div
             key={card.title}
-            className={`group relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br ${card.gradient} p-6 transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-xl hover:shadow-violet-500/10`}
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md"
           >
-            <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/5 blur-3xl" />
-
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-sm text-slate-400">
+                <p className="text-xs uppercase tracking-wider text-muted font-medium">
                   {card.title}
                 </p>
 
-                <h2 className="mt-3 text-4xl font-bold text-white">
+                <h2 className="mt-2 text-3xl font-bold text-primary">
                   {card.value}
                 </h2>
 
-                <p className="mt-2 text-sm text-slate-400">
+                <p className="mt-1 text-xs text-muted">
                   {card.subtitle}
                 </p>
               </div>
 
-              <div
-                className={`rounded-2xl ${card.iconBg} p-3`}
-              >
+              <div className={`rounded-xl ${card.iconBg} p-3`}>
                 <Icon
                   className={card.iconColor}
-                  size={26}
+                  size={22}
                 />
               </div>
             </div>
 
-            <div className="mt-8 flex items-center justify-between border-t border-slate-800 pt-4">
-              <span className="text-xs text-slate-500">
+            <div className="mt-5 flex items-center justify-between border-t border-border pt-3">
+              <span className="text-xs text-muted">
                 Updated just now
               </span>
 
               <ArrowUpRight
-                size={18}
-                className="text-slate-500 transition group-hover:text-white"
+                size={16}
+                className="text-muted transition group-hover:text-accent"
               />
             </div>
           </div>

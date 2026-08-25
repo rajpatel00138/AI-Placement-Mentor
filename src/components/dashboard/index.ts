@@ -1,6 +1,7 @@
 export * from "./StatCard";
 export * from "./AIInsightCard";
 export * from "./ProgressChart";
+export * from "./MomentumGauge";
 export * from "./WeakTopics";
 export * from "./TaskChecklist";
 export * from "./RecentActivity";

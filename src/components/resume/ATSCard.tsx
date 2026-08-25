@@ -16,56 +16,48 @@ export default function ATSCard({ score }: ATSCardProps) {
   };
 
   const getColor = () => {
-    if (score >= 85) return "text-green-400";
-    if (score >= 70) return "text-cyan-400";
-    if (score >= 50) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 71) return "text-success";
+    if (score >= 41) return "text-warning";
+    return "text-error";
   };
 
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      transition={{ duration: .25 }}
-      className="rounded-3xl border border-slate-700 bg-slate-900/80 p-6 backdrop-blur-xl shadow-xl"
+      transition={{ duration: 0.25 }}
+      className="rounded-3xl border border-border bg-surface p-6 shadow-sm backdrop-blur-xl"
     >
       <div className="flex items-center justify-between">
-
         <div>
-
-          <p className="text-slate-400">
+          <p className="text-sm text-muted">
             ATS Score
           </p>
 
-          <h1 className="mt-4 text-6xl font-bold text-white">
+          <h1 className="mt-4 text-5xl sm:text-6xl font-bold text-primary">
             {score}
-            <span className="text-3xl text-slate-500">%</span>
+            <span className="text-2xl sm:text-3xl text-muted font-normal">%</span>
           </h1>
 
-          <p className={`mt-4 font-semibold ${getColor()}`}>
+          <p className={`mt-4 font-semibold text-sm ${getColor()}`}>
             {getStatus()}
           </p>
-
         </div>
 
-        <div className="rounded-2xl bg-indigo-500/10 p-4">
-
-          <Award className="h-10 w-10 text-indigo-400"/>
-
+        <div className="rounded-2xl border border-border bg-soft p-4 text-accent">
+          <Award className="h-9 w-9 text-accent" />
         </div>
-
       </div>
 
-      <div className="mt-6 h-3 overflow-hidden rounded-full bg-slate-800">
-
+      <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-border">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 transition-all duration-1000"
+          className={`h-full rounded-full transition-all duration-1000 ${
+            score >= 71 ? "bg-success" : score >= 41 ? "bg-warning" : "bg-error"
+          }`}
           style={{
             width: `${score}%`,
           }}
         />
-
       </div>
-
     </motion.div>
   );
 }

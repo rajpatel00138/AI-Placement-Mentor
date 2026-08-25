@@ -15,41 +15,41 @@ export default function ProgressBar({
     total === 0 ? 0 : Math.round((solved / total) * 100);
 
   return (
-    <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-lg">
+    <div id="overall-progress" className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
       {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-lg font-bold text-primary">
             Overall Progress
           </h2>
 
-          <p className="mt-1 text-sm text-slate-400">
-            Keep solving consistently to reach your goal.
+          <p className="mt-1 text-xs sm:text-sm text-muted">
+            Keep solving consistently to reach your placement readiness target.
           </p>
         </div>
 
-        <div className="rounded-xl bg-blue-600/20 p-3">
+        <div className="rounded-xl border border-border bg-soft p-3 text-accent">
           <Target
             size={22}
-            className="text-blue-400"
+            className="text-accent"
           />
         </div>
       </div>
 
       {/* Progress */}
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm text-slate-400">
+        <span className="text-xs sm:text-sm font-medium text-muted">
           {solved} / {total} Problems Solved
         </span>
 
-        <span className="font-semibold text-blue-400">
+        <span className="font-bold text-sm text-accent">
           {percentage}%
         </span>
       </div>
 
-      <div className="h-3 overflow-hidden rounded-full bg-slate-700">
+      <div className="h-2.5 overflow-hidden rounded-full bg-border">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-violet-500 transition-all duration-700"
+          className="h-full rounded-full bg-accent transition-all duration-700"
           style={{
             width: `${percentage}%`,
           }}
@@ -57,32 +57,32 @@ export default function ProgressBar({
       </div>
 
       {/* Footer */}
-      <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-700 bg-slate-950 p-4">
+      <div className="mt-5 flex items-center justify-between rounded-xl border border-border bg-elevated p-4">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-yellow-500/20 p-2">
+          <div className="rounded-lg border border-warning/30 bg-warning/15 p-2 text-warning">
             <Trophy
               size={18}
-              className="text-yellow-400"
+              className="text-warning"
             />
           </div>
 
           <div>
-            <p className="text-sm font-medium text-white">
-              Current Progress
+            <p className="text-xs uppercase tracking-wider text-muted font-medium">
+              Current Milestone
             </p>
 
-            <p className="text-xs text-slate-400">
-              Stay consistent every day.
+            <p className="text-sm font-semibold text-primary">
+              Daily Practice Active
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-lg font-bold text-white">
+          <p className="text-lg font-bold text-primary">
             {percentage}%
           </p>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted">
             Completed
           </p>
         </div>

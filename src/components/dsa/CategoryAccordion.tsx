@@ -31,14 +31,14 @@ export default function CategoryAccordion({
         .filter(
           ([, value]) =>
             value === "completed" ||
-            value === "done"
+            (value as string) === "done"
         )
         .map(([id]) => id)
     );
   }, [status]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {categories.map((category) => {
         const isOpen = openCategory === category.id;
 
@@ -69,7 +69,7 @@ export default function CategoryAccordion({
         return (
           <div
             key={category.id}
-            className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-lg transition-all"
+            className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all"
           >
             <button
               onClick={() =>
@@ -77,107 +77,91 @@ export default function CategoryAccordion({
                   isOpen ? null : category.id
                 )
               }
-              className="w-full p-6 text-left"
+              className="w-full p-5 sm:p-6 text-left hover:bg-soft/20 transition cursor-pointer"
             >
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 {/* Left */}
-
                 <div className="flex items-center gap-4">
-
-                  <div className="rounded-xl bg-blue-500/15 p-3">
+                  <div className="rounded-xl border border-border bg-soft p-3 text-accent">
                     <FolderOpen
-                      className="text-blue-400"
+                      className="text-accent"
                       size={22}
                     />
                   </div>
 
                   <div>
-
                     <div className="flex items-center gap-2">
-
-                      <h2 className="text-xl font-bold text-white">
+                      <h2 className="text-lg sm:text-xl font-bold text-primary">
                         {category.name}
                       </h2>
 
                       {isOpen ? (
                         <ChevronDown
-                          className="text-slate-400"
+                          className="text-muted"
                           size={18}
                         />
                       ) : (
                         <ChevronRight
-                          className="text-slate-400"
+                          className="text-muted"
                           size={18}
                         />
                       )}
-
                     </div>
 
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-xs sm:text-sm text-muted">
                       {category.groups.length} Sections •{" "}
                       {totalProblems} Problems
                     </p>
-
                   </div>
-
                 </div>
 
-                {/* Right */}
-
+                {/* Right Progress */}
                 <div className="w-full max-w-sm">
-
                   <div className="mb-2 flex items-center justify-between">
-
-                    <span className="text-sm text-slate-400">
+                    <span className="text-xs text-muted font-medium uppercase tracking-wider">
                       Progress
                     </span>
 
-                    <span className="font-semibold text-white">
+                    <span className="text-sm font-bold text-primary">
                       {solvedProblems}/{totalProblems}
                     </span>
-
                   </div>
 
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-700">
-
+                  <div className="h-2 overflow-hidden rounded-full bg-border">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-violet-500 transition-all duration-700"
+                      className="h-full rounded-full bg-accent transition-all duration-700"
                       style={{
                         width: `${progress}%`,
                       }}
                     />
-
                   </div>
 
-                  <p className="mt-2 text-right text-xs text-slate-400">
+                  <p className="mt-1.5 text-right text-xs font-semibold text-accent">
                     {progress}% Completed
                   </p>
-
                 </div>
-
               </div>
-
             </button>
-                        {isOpen && (
-              <div className="border-t border-slate-700 bg-slate-950/60 p-6">
-                <div className="space-y-8">
+
+            {isOpen && (
+              <div className="border-t border-border bg-elevated p-4 sm:p-6">
+                <div className="space-y-6">
                   {category.groups.map((group, index) => (
                     <div key={index}>
                       {group.name && (
-                        <div className="mb-4 flex items-center gap-2">
+                        <div className="mb-3 flex items-center gap-2">
                           <Layers3
                             size={18}
-                            className="text-blue-400"
+                            className="text-accent"
                           />
 
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-base font-bold text-primary">
                             {group.name}
                           </h3>
                         </div>
                       )}
 
-                      <div className="space-y-3">
+                      <div className="space-y-2.5">
                         {group.problems.map((problem) => (
                           <ProblemRow
                             key={problem.id}

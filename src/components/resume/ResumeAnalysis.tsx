@@ -27,11 +27,11 @@ export default function ResumeAnalysis({
 
       {/* Heading */}
       <div>
-        <h2 className="text-3xl font-bold text-white">
+        <h2 className="text-3xl font-bold text-primary">
           Resume Analysis
         </h2>
 
-        <p className="mt-2 text-slate-400">
+        <p className="mt-2 text-muted">
           AI generated insights based on your uploaded resume.
         </p>
       </div>
