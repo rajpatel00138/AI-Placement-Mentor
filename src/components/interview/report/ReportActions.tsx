@@ -15,7 +15,7 @@ export default function ReportActions() {
           resetInterview();
           router.push("/dashboard/interview/start");
         }}
-        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-violet-600 px-6 py-4 font-semibold text-white transition hover:bg-violet-700"
+        className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-accent px-6 py-4 font-semibold text-on-accent transition hover:bg-accent-hover"
       >
         <RotateCcw size={20} />
         Start Another Interview
@@ -26,7 +26,7 @@ export default function ReportActions() {
           resetInterview();
           router.push("/dashboard");
         }}
-        className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-slate-700 px-6 py-4 font-semibold text-white transition hover:border-violet-500"
+        className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border px-6 py-4 font-semibold text-heading transition hover:border-accent hover:text-accent"
       >
         <LayoutDashboard size={20} />
         Back to Dashboard

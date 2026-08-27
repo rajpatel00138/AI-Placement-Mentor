@@ -209,8 +209,19 @@ a {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
+  color: inherit;
+}
+
+.text-heading {
+  color: var(--color-text-primary) !important;
+}
+
+.text-body-muted {
+  color: var(--color-text-muted) !important;
 }
 
 @layer base {
@@ -218,7 +229,8 @@ input {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-base text-primary;
+    @apply bg-base;
+    color: var(--color-text-primary);
   }
   html {
     @apply font-sans;

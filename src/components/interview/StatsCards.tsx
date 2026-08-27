@@ -22,24 +22,24 @@ const stats = [
     value: "92%",
     subtitle: "Highest Performance",
     icon: Trophy,
-    iconBg: "bg-success/15 border border-success/30",
-    iconColor: "text-success",
+    iconBg: "bg-accent-secondary/15 border border-accent-secondary/30",
+    iconColor: "text-accent-secondary",
   },
   {
     title: "Current Streak",
     value: "8",
     subtitle: "Active Days",
     icon: Flame,
-    iconBg: "bg-warning/15 border border-warning/30",
-    iconColor: "text-warning",
+    iconBg: "bg-accent-secondary/15 border border-accent-secondary/30",
+    iconColor: "text-accent-secondary",
   },
   {
     title: "AI Mentor Status",
     value: "Ready",
     subtitle: "Gemini 2.5 Flash",
     icon: Brain,
-    iconBg: "bg-success/15 border border-success/30",
-    iconColor: "text-success",
+    iconBg: "bg-accent/15 border border-accent/30",
+    iconColor: "text-accent",
   },
 ];
 
@@ -52,19 +52,19 @@ export default function StatsCards() {
         return (
           <div
             key={card.title}
-            className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-md"
           >
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wider text-muted font-medium">
+                <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-medium">
                   {card.title}
                 </p>
 
-                <h2 className="mt-2 text-3xl font-bold text-primary">
+                <h2 className="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-100">
                   {card.value}
                 </h2>
 
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
                   {card.subtitle}
                 </p>
               </div>
@@ -78,13 +78,13 @@ export default function StatsCards() {
             </div>
 
             <div className="mt-5 flex items-center justify-between border-t border-border pt-3">
-              <span className="text-xs text-muted">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 Updated just now
               </span>
 
               <ArrowUpRight
                 size={16}
-                className="text-muted transition group-hover:text-accent"
+                className="text-slate-400 transition group-hover:text-accent"
               />
             </div>
           </div>

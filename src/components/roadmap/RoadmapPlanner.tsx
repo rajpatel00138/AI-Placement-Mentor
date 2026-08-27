@@ -7,7 +7,6 @@ import {
   BookOpen,
   BrainCircuit,
   BriefcaseBusiness,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Circle,
@@ -15,7 +14,6 @@ import {
   Code2,
   Compass,
   Cpu,
-  ExternalLink,
   Lightbulb,
   LockKeyhole,
   Palette,
@@ -24,10 +22,10 @@ import {
   Target,
   X,
 } from "lucide-react";
+import RoadmapGraph from "./RoadmapGraph";
+import type { Step, LearningResource } from "./RoadmapGraph";
 
 type CourseGroup = { title: string; icon: LucideIcon; color: string; courses: string[] };
-type LearningResource = { label: string; url: string };
-type Step = { title: string; description: string; topics: string[]; outcome: string; icon: LucideIcon; resources: LearningResource[] };
 
 const courseGroups: CourseGroup[] = [
   { title: "Technology & Software", icon: Code2, color: "text-accent", courses: ["Computer Science", "Programming Fundamentals", "C Programming", "C++", "Java", "Python", "JavaScript", "TypeScript", "Data Structures & Algorithms", "Object-Oriented Programming", "Database Management", "SQL", "Backend Development", "Frontend Development", "Full-Stack Development", "Mobile App Development", "Android Development", "iOS Development", "Game Development", "Software Engineering", "System Design", "API Development", "Git & GitHub", "Open Source Development"] },
@@ -297,124 +295,15 @@ export default function RoadmapPlanner() {
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main className="relative overflow-hidden p-6 sm:p-10 bg-surface">
-          <div className="relative mx-auto max-w-2xl">
-            {/* Header Title */}
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-soft px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                <span>{group.title}</span>
-              </div>
-              <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-primary sm:text-4xl">
-                {selectedCourse}
-              </h1>
-              <p className="mx-auto mt-2 max-w-xl text-xs sm:text-sm leading-relaxed text-muted">
-                Follow each milestone systematically. Mark a stage complete after understanding concepts and building hands-on proof.
-              </p>
-            </div>
-
-            {/* Steps Timeline */}
-            <div className="mx-auto mt-10 max-w-lg">
-              {roadmap.map((step, index) => {
-                const Icon = step.icon;
-                const id = `${selectedCourse}-${step.title}`;
-                const done = completed.includes(id);
-                const current = !done && index === completeCount;
-
-                return (
-                  <div key={step.title} className="flex flex-col items-center">
-                    <article
-                      className={`w-full rounded-2xl border p-5 text-left shadow-sm transition hover:-translate-y-0.5 ${
-                        done
-                          ? "border-success/40 bg-success/10"
-                          : current
-                          ? "border-accent/40 bg-soft/50 ring-1 ring-accent/30 shadow-md"
-                          : "border-border bg-elevated hover:bg-soft/30"
-                      }`}
-                    >
-                      <div className="flex gap-4">
-                        {/* Status Checkbox / Icon Button */}
-                        <button
-                          type="button"
-                          onClick={() => toggle(step)}
-                          aria-label={`Mark ${step.title} as ${done ? "incomplete" : "complete"}`}
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition hover:scale-105 cursor-pointer ${
-                            done
-                              ? "bg-success text-on-accent shadow-sm"
-                              : current
-                              ? "bg-accent text-on-accent shadow-sm"
-                              : "border border-border bg-base text-muted"
-                          }`}
-                        >
-                          {done ? <CheckCircle2 size={22} /> : <Icon size={20} />}
-                        </button>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <h2 className="text-base font-bold text-primary">
-                              {step.title}
-                            </h2>
-                            <span
-                              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                                done
-                                  ? "bg-success/15 border border-success/30 text-success"
-                                  : current
-                                  ? "bg-accent/15 border border-accent/30 text-accent"
-                                  : "bg-base border border-border text-muted"
-                              }`}
-                            >
-                              {done ? "Completed" : current ? "Current Module" : "Up next"}
-                            </span>
-                          </div>
-
-                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-muted">
-                            {step.description}
-                          </p>
-
-                          {/* Topic Pills */}
-                          <div className="mt-3 flex flex-wrap gap-1.5">
-                            {step.topics.map((topic) => (
-                              <span
-                                key={topic}
-                                className="rounded-lg border border-border bg-base px-2.5 py-1 text-[11px] font-medium text-primary"
-                              >
-                                {topic}
-                              </span>
-                            ))}
-                          </div>
-
-                          {/* Resources Links */}
-                          <div className="mt-3.5 flex flex-wrap gap-2">
-                            {step.resources.map((resource) => (
-                              <a
-                                key={resource.url}
-                                href={resource.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-base px-2.5 py-1.5 text-xs font-semibold text-accent transition hover:bg-soft hover:text-accent-hover"
-                              >
-                                <span>Learn: {resource.label}</span>
-                                <ExternalLink size={12} />
-                              </a>
-                            ))}
-                          </div>
-
-                          <p className="mt-3 text-xs font-medium text-muted">
-                            <span className="font-bold text-primary">Target Outcome:</span> {step.outcome}
-                          </p>
-                        </div>
-                      </div>
-                    </article>
-
-                    {/* Step connecting vertical line */}
-                    {index < roadmap.length - 1 ? (
-                      <div className={`h-8 w-0.5 ${done ? "bg-success" : "bg-border"}`} />
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        {/* Main Content Area — node graph */}
+        <main className="relative flex min-h-0 flex-col overflow-hidden bg-surface">
+          <RoadmapGraph
+            roadmap={roadmap}
+            selectedCourse={selectedCourse}
+            group={group}
+            completed={completed}
+            toggle={toggle}
+          />
         </main>
       </div>
     </div>

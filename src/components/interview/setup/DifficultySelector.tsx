@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Shield, Flame, Skull } from "lucide-react";
 import {
   useInterview,
@@ -11,76 +10,71 @@ const difficulties = [
   {
     id: "easy",
     title: "Easy",
-    description: "Beginner friendly questions",
+    description: "Beginner friendly questions & foundational concepts",
     icon: Shield,
-    color: "text-green-400",
-    bg: "bg-green-500/15",
   },
   {
     id: "medium",
     title: "Medium",
-    description: "Most interview questions",
+    description: "Industry-standard placement interview questions",
     icon: Flame,
-    color: "text-amber-400",
-    bg: "bg-amber-500/15",
   },
   {
     id: "hard",
     title: "Hard",
-    description: "Company-level challenges",
+    description: "Tier-1 company challenges & complex edge cases",
     icon: Skull,
-    color: "text-red-400",
-    bg: "bg-red-500/15",
   },
 ];
 
 export default function DifficultySelector() {
-  const {
-        state,
-        setDifficulty,
-    } = useInterview();
+  const { state, setDifficulty } = useInterview();
+
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-      <h2 className="text-xl font-bold text-white">
+    <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-lg sm:text-xl font-bold text-heading">
         Select Difficulty
       </h2>
 
-      <p className="mt-2 text-slate-400">
-        Choose the interview difficulty level.
+      <p className="mt-1 text-xs sm:text-sm text-body-muted">
+        Calibrate the depth and complexity of generated questions.
       </p>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
         {difficulties.map((difficulty) => {
           const Icon = difficulty.icon;
-          const active =
-          state.difficulty === difficulty.id;
+          const active = state.difficulty === difficulty.id;
 
           return (
             <button
               key={difficulty.id}
-              onClick={() =>
-                    setDifficulty(difficulty.id as Difficulty)
-                }
-              className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
+              type="button"
+              onClick={() => setDifficulty(difficulty.id as Difficulty)}
+              className={`flex flex-col justify-between rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/10"
-                  : "border-slate-800 bg-slate-950 hover:border-violet-500/40"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
               }`}
             >
-              <div className={`inline-flex rounded-xl p-3 ${difficulty.bg}`}>
-                <Icon
-                  className={difficulty.color}
-                  size={24}
-                />
+              <div>
+                <div
+                  className={`inline-flex rounded-xl p-2.5 transition-colors ${
+                    active
+                      ? "bg-accent text-on-accent shadow-xs"
+                      : "bg-accent/10 text-accent group-hover:bg-accent/20"
+                  }`}
+                >
+                  <Icon size={20} />
+                </div>
+
+                <h3 className="mt-3.5 text-sm sm:text-base font-bold text-heading">
+                  {difficulty.title}
+                </h3>
+
+                <p className="mt-1 text-xs leading-relaxed text-body-muted">
+                  {difficulty.description}
+                </p>
               </div>
-
-              <h3 className="mt-4 text-lg font-semibold text-white">
-                {difficulty.title}
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-400">
-                {difficulty.description}
-              </p>
             </button>
           );
         })}

@@ -53,11 +53,11 @@ export default function CompanyMockSection() {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-primary">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
           Company Mock Interviews
         </h2>
 
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Practice company-specific interview rounds with AI-powered diagnostic feedback.
         </p>
       </div>
@@ -69,35 +69,29 @@ export default function CompanyMockSection() {
             className="group rounded-3xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
           >
             <div className="flex items-center gap-3.5">
-              <div className="rounded-2xl border border-border bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
+              <div className="rounded-2xl border border-accent/30 bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
                 <Building2 size={24} />
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-primary">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                   {company.name}
                 </h3>
 
-                <span className={`inline-block rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${
-                  company.difficulty === "hard"
-                    ? "bg-error/15 text-error border border-error/30"
-                    : company.difficulty === "medium"
-                    ? "bg-warning/15 text-warning border border-warning/30"
-                    : "bg-success/15 text-success border border-success/30"
-                }`}>
+                <span className="inline-block rounded-md bg-base border border-border px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                   {company.difficulty}
                 </span>
               </div>
             </div>
 
-            <div className="mt-5 space-y-2.5 text-xs font-medium text-muted">
+            <div className="mt-5 space-y-2.5 text-xs font-medium text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-2">
-                <Clock3 size={15} className="text-muted" />
+                <Clock3 size={15} className="text-slate-400" />
                 <span>{company.duration} Duration</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <BarChart3 size={15} className="text-muted" />
+                <BarChart3 size={15} className="text-slate-400" />
                 <span>{company.questions} Questions</span>
               </div>
             </div>
@@ -110,7 +104,7 @@ export default function CompanyMockSection() {
                   )}&difficulty=${company.difficulty}`
                 )
               }
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-accent hover:bg-accent-hover px-4 py-2.5 text-xs font-semibold text-on-accent shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-accent hover:bg-accent-hover px-4 py-2.5 text-xs font-semibold text-on-accent shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <span>Start Mock</span>
               <ArrowRight size={15} />

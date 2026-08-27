@@ -77,11 +77,11 @@ export default function CategoryGrid() {
   return (
     <section className="space-y-5">
       <div>
-        <h2 className="text-2xl font-bold text-primary">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
           Interview Categories
         </h2>
 
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Choose a domain and start practicing with AI-powered mock interviews.
         </p>
       </div>
@@ -98,15 +98,15 @@ export default function CategoryGrid() {
               }
               className="group rounded-2xl border border-border bg-surface p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent hover:shadow-md cursor-pointer"
             >
-              <div className="inline-flex rounded-xl border border-border bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
+              <div className="inline-flex rounded-xl border border-accent/30 bg-soft p-3 text-accent transition-transform duration-300 group-hover:scale-105">
                 <Icon size={22} className="text-accent" />
               </div>
 
-              <h3 className="mt-4 text-base font-bold text-primary group-hover:text-accent transition">
+              <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-accent transition">
                 {category.title}
               </h3>
 
-              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted">
+              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
                 {category.description}
               </p>
 

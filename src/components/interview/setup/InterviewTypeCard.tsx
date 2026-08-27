@@ -14,7 +14,7 @@ import {
 import {
   useInterview,
   type InterviewType,
-} from "@/context/InterviewContext";    
+} from "@/context/InterviewContext";
 
 const interviewTypes = [
   {
@@ -22,117 +22,99 @@ const interviewTypes = [
     title: "HR Interview",
     description: "Behavioral & communication round",
     icon: Users,
-    color: "text-pink-400",
-    bg: "bg-pink-500/15",
   },
   {
     id: "technical",
     title: "Technical",
-    description: "Programming & core CS",
+    description: "Programming & core CS fundamentals",
     icon: Laptop2,
-    color: "text-blue-400",
-    bg: "bg-blue-500/15",
   },
   {
     id: "dsa",
-    title: "DSA",
-    description: "Coding interview",
+    title: "DSA & Algorithms",
+    description: "Live coding & algorithm challenges",
     icon: BrainCircuit,
-    color: "text-violet-400",
-    bg: "bg-violet-500/15",
   },
   {
     id: "dbms",
-    title: "DBMS",
-    description: "SQL & Database",
+    title: "DBMS & SQL",
+    description: "Database queries & schema design",
     icon: Database,
-    color: "text-green-400",
-    bg: "bg-green-500/15",
   },
   {
     id: "os",
-    title: "Operating System",
-    description: "Process & Memory",
+    title: "Operating Systems",
+    description: "Processes, threads & memory management",
     icon: Cpu,
-    color: "text-orange-400",
-    bg: "bg-orange-500/15",
   },
   {
     id: "cn",
     title: "Computer Networks",
-    description: "TCP/IP & Protocols",
+    description: "Protocols, TCP/IP & network models",
     icon: Network,
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/15",
   },
   {
     id: "system-design",
     title: "System Design",
-    description: "Scalable Architecture",
+    description: "Scalable architecture & distributed systems",
     icon: Boxes,
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/15",
   },
   {
     id: "aptitude",
-    title: "Aptitude",
-    description: "Quantitative, logical & verbal ability",
+    title: "Aptitude Round",
+    description: "Quantitative, logical & verbal reasoning",
     icon: Calculator,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/15",
   },
 ];
 
 export default function InterviewTypeCard() {
-    const {
-        state,
-        setInterviewType,
-    } = useInterview();
+  const { state, setInterviewType } = useInterview();
 
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-      <h2 className="text-xl font-bold text-white">
+    <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-lg sm:text-xl font-bold text-heading">
         Select Interview Type
       </h2>
 
-      <p className="mt-2 text-slate-400">
-        Choose the interview you want to practice.
+      <p className="mt-1 text-xs sm:text-sm text-body-muted">
+        Choose the specialized focus domain for this practice interview.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {interviewTypes.map((type) => {
           const Icon = type.icon;
-          const active =
-          state.interviewType === type.id;
+          const active = state.interviewType === type.id;
 
           return (
             <button
               key={type.id}
-              onClick={() =>
-                   setInterviewType(type.id as InterviewType)
-                }
-              className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
+              type="button"
+              onClick={() => setInterviewType(type.id as InterviewType)}
+              className={`group flex flex-col justify-between rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-500/10"
-                  : "border-slate-800 bg-slate-950 hover:border-violet-500/40"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
               }`}
             >
-              <div
-                className={`inline-flex rounded-xl p-3 ${type.bg}`}
-              >
-                <Icon
-                  size={24}
-                  className={type.color}
-                />
+              <div>
+                <div
+                  className={`inline-flex rounded-xl p-2.5 transition-colors ${
+                    active
+                      ? "bg-accent text-on-accent shadow-xs"
+                      : "bg-accent/10 text-accent group-hover:bg-accent/20"
+                  }`}
+                >
+                  <Icon size={20} />
+                </div>
+
+                <h3 className="mt-3.5 text-sm sm:text-base font-bold text-heading">
+                  {type.title}
+                </h3>
+
+                <p className="mt-1 text-xs leading-relaxed text-body-muted">
+                  {type.description}
+                </p>
               </div>
-
-              <h3 className="mt-4 font-semibold text-white">
-                {type.title}
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-400">
-                {type.description}
-              </p>
             </button>
           );
         })}

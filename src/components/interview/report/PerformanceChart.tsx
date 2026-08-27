@@ -37,39 +37,48 @@ export default function PerformanceChart() {
   ];
 
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-      <h2 className="text-2xl font-bold text-white">
+    <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-2xl font-bold text-heading">
         Performance Analysis
       </h2>
 
-      <p className="mt-2 text-slate-400">
+      <p className="mt-2 text-body-muted">
         Visual representation of your interview performance.
       </p>
 
       <div className="mt-8 h-80">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <CartesianGrid stroke="#334155" />
+            <CartesianGrid stroke="var(--color-border)" />
 
             <XAxis
               dataKey="round"
-              stroke="#94A3B8"
+              stroke="var(--color-text-muted)"
             />
 
             <YAxis
               domain={[0, 100]}
-              stroke="#94A3B8"
+              stroke="var(--color-text-muted)"
             />
 
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--color-bg-elevated)",
+                borderColor: "var(--color-border)",
+                color: "var(--color-text-primary)",
+                borderRadius: "0.75rem",
+              }}
+              labelStyle={{ color: "var(--color-text-primary)" }}
+              itemStyle={{ color: "var(--color-accent)" }}
+            />
 
             <Line
               type="monotone"
               dataKey="score"
-              stroke="#8B5CF6"
+              stroke="var(--color-accent)"
               strokeWidth={3}
-              dot={{ r: 6 }}
-              activeDot={{ r: 8 }}
+              dot={{ r: 6, fill: "var(--color-accent)" }}
+              activeDot={{ r: 8, fill: "var(--color-accent-hover)" }}
             />
           </LineChart>
         </ResponsiveContainer>

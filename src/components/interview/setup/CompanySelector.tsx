@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useInterview } from "@/context/InterviewContext";
-
-import {
-  Search,
-  Building2,
-  Check,
-} from "lucide-react";
+import { Search, Building2, Check } from "lucide-react";
 
 const companies = [
   "Google",
@@ -30,94 +25,79 @@ const companies = [
 
 export default function CompanySelector() {
   const { state, setCompany } = useInterview();
-
-   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const filteredCompanies = companies.filter((company) =>
     company.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <section className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-
-      <h2 className="text-xl font-bold text-white">
-        Select Company
+    <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-lg sm:text-xl font-bold text-heading">
+        Select Target Company
       </h2>
 
-      <p className="mt-2 text-slate-400">
-        Practice company-specific interview questions.
+      <p className="mt-1 text-xs sm:text-sm text-body-muted">
+        Practice interview questions tailored to company-specific hiring patterns.
       </p>
 
-      {/* Search */}
-
-      <div className="relative mt-6">
-
+      {/* Search Bar */}
+      <div className="relative mt-5">
         <Search
           size={18}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
         />
 
         <input
           type="text"
-          placeholder="Search company..."
+          placeholder="Search target company..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-11 pr-4 text-white outline-none transition focus:border-violet-500"
+          className="w-full rounded-2xl border border-border bg-base px-4 py-3 pl-11 text-sm font-medium text-heading placeholder:text-slate-400 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs"
         />
-
       </div>
 
       {/* Company Grid */}
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {filteredCompanies.map((company) => {
-
           const active = company === state.company;
 
           return (
-
             <button
               key={company}
+              type="button"
               onClick={() => setCompany(company)}
-              className={`flex items-center justify-between rounded-2xl border p-4 transition-all duration-300 ${
+              className={`flex items-center justify-between rounded-2xl border p-3.5 sm:p-4 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-violet-500 bg-violet-500/10"
-                  : "border-slate-800 bg-slate-950 hover:border-violet-500/40"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
               }`}
             >
-
               <div className="flex items-center gap-3">
-
-                <div className="rounded-xl bg-violet-500/15 p-2">
-
-                  <Building2
-                    size={18}
-                    className="text-violet-400"
-                  />
-
+                <div
+                  className={`rounded-xl p-2 transition-colors ${
+                    active
+                      ? "bg-accent text-on-accent shadow-xs"
+                      : "bg-accent/10 text-accent group-hover:bg-accent/20"
+                  }`}
+                >
+                  <Building2 size={18} />
                 </div>
 
-                <span className="font-medium text-white">
+                <span className="text-sm font-semibold text-heading">
                   {company}
                 </span>
-
               </div>
 
               {active && (
-                <Check
-                  size={18}
-                  className="text-green-400"
-                />
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-on-accent shadow-2xs">
+                  <Check size={14} />
+                </div>
               )}
-
             </button>
-
           );
         })}
-
       </div>
-
     </section>
   );
 }

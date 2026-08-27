@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
-import {
-  Brain,
-  Languages,
-  ListChecks,
-} from "lucide-react";
+import { Brain, Languages, ListChecks, Sparkles } from "lucide-react";
 
 import InterviewTypeCard from "./InterviewTypeCard";
 import DifficultySelector from "./DifficultySelector";
@@ -21,7 +16,7 @@ export default function InterviewSetup({
 }: {
   initialInterviewType?: InterviewType;
 }) {
-  const { setInterviewType } = useInterview();
+  const { state, setInterviewType, setLanguage } = useInterview();
 
   useEffect(() => {
     if (initialInterviewType) {
@@ -31,105 +26,88 @@ export default function InterviewSetup({
 
   return (
     <div className="space-y-8">
+      {/* Configure Your Interview Hero Section */}
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-8 shadow-sm backdrop-blur-xl">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-accent-secondary/10 blur-3xl" />
 
-      {/* Header */}
-
-      <section className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-black p-8">
-
-        <div className="inline-flex items-center gap-2 rounded-full bg-violet-500/15 px-4 py-2 text-violet-300">
-          <Brain size={16} />
-          AI Mock Interview
-        </div>
-
-        <h1 className="mt-5 text-4xl font-bold text-white">
-          Configure Your Interview
-        </h1>
-
-        <p className="mt-4 max-w-3xl text-slate-400">
-          Choose interview type, company, duration and difficulty.
-          Our AI will generate personalized interview questions and
-          provide detailed overallFeedback after the session.
-        </p>
-
-      </section>
-
-      {/* Grid */}
-
-      <div className="grid gap-8 lg:grid-cols-3">
-
-        {/* Left */}
-
-        <div className="space-y-6 lg:col-span-2">
-
-          <InterviewTypeCard />
-
-          <DifficultySelector />
-
-          <CompanySelector />
-          <QuestionFormatSelector />
-
-        </div>
-
-        {/* Right */}
-
-        <div className="space-y-6">
-
-          <DurationSelector />
-
-          {/* Questions */}
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-
-            <div className="mb-5 flex items-center gap-3">
-
-              <ListChecks className="text-violet-400" />
-
-              <h2 className="text-lg font-semibold text-white">
-                Number of Questions
-              </h2>
-
-            </div>
-
-            <select className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none">
-
-              <option>5 Questions</option>
-              <option>10 Questions</option>
-              <option>15 Questions</option>
-              <option>20 Questions</option>
-
-            </select>
-
+        <div className="relative z-10 space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1 text-xs font-semibold text-accent shadow-xs">
+            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            <span>AI Mock Interview Setup</span>
           </div>
 
-          {/* Language */}
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-heading">
+            Configure Your Interview
+          </h1>
 
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
+          <p className="max-w-3xl text-sm sm:text-base text-body-muted leading-relaxed font-normal">
+            Choose interview type, target company, duration, and difficulty level.
+            Our AI generates tailored questions and provides actionable evaluation feedback after your session.
+          </p>
+        </div>
+      </section>
 
-            <div className="mb-5 flex items-center gap-3">
+      {/* Configuration Grid */}
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Left Column - Main Selectors */}
+        <div className="space-y-6 lg:col-span-2">
+          <InterviewTypeCard />
+          <DifficultySelector />
+          <CompanySelector />
+          <QuestionFormatSelector />
+        </div>
 
-              <Languages className="text-cyan-400" />
+        {/* Right Column - Duration & Session Settings */}
+        <div className="space-y-6">
+          <DurationSelector />
 
-              <h2 className="text-lg font-semibold text-white">
-                Language
+          {/* Number of Questions Selector */}
+          <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="rounded-xl bg-accent/10 border border-accent/30 p-2 text-accent">
+                <ListChecks size={18} />
+              </div>
+              <h2 className="text-base font-bold text-heading">
+                Number of Questions
               </h2>
-
             </div>
 
-            <select className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none">
-
-              <option>English</option>
-              <option>Hinglish</option>
-
+            <select
+              defaultValue="5 Questions"
+              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-heading outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
+            >
+              <option value="5 Questions" className="bg-surface text-heading">5 Questions (Recommended)</option>
+              <option value="10 Questions" className="bg-surface text-heading">10 Questions</option>
+              <option value="15 Questions" className="bg-surface text-heading">15 Questions</option>
+              <option value="20 Questions" className="bg-surface text-heading">20 Questions</option>
             </select>
+          </div>
 
+          {/* Language Selector */}
+          <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="rounded-xl bg-accent/10 border border-accent/30 p-2 text-accent">
+                <Languages size={18} />
+              </div>
+              <h2 className="text-base font-bold text-heading">
+                Language
+              </h2>
+            </div>
+
+            <select
+              value={state.language || "English"}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-heading outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
+            >
+              <option value="English" className="bg-surface text-heading">English</option>
+              <option value="Hinglish" className="bg-surface text-heading">Hinglish</option>
+            </select>
           </div>
 
           <StartButton />
-
         </div>
-
       </div>
-
     </div>
   );
 }

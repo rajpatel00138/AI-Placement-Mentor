@@ -7,25 +7,25 @@ const formats: {
   value: QuestionFormat;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: typeof FileText;
 }[] = [
   {
     value: "descriptive",
     title: "Descriptive",
-    description: "Answer interview questions in detail.",
-    icon: <FileText size={22} />,
+    description: "Answer technical and behavioral questions in full detail.",
+    icon: FileText,
   },
   {
     value: "mcq",
-    title: "MCQ",
-    description: "Solve multiple choice interview questions.",
-    icon: <CheckSquare size={22} />,
+    title: "Multiple Choice (MCQ)",
+    description: "Solve rapid multiple-choice questions with instant scoring.",
+    icon: CheckSquare,
   },
   {
     value: "mixed",
-    title: "Mixed",
-    description: "Combination of descriptive and MCQs.",
-    icon: <Shuffle size={22} />,
+    title: "Mixed Format",
+    description: "Realistic mix of descriptive questions and MCQs.",
+    icon: Shuffle,
   },
 ];
 
@@ -36,17 +36,18 @@ export default function QuestionFormatSelector() {
   } = useInterview();
 
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-      <h2 className="mb-6 text-lg font-semibold text-white">
+    <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-lg sm:text-xl font-bold text-heading">
         Question Format
       </h2>
 
-      <p className="-mt-3 mb-6 text-sm text-slate-400">
-        MCQ works best for aptitude practice.
+      <p className="mt-1 text-xs sm:text-sm text-body-muted">
+        Select whether you want open descriptive answers, MCQs, or a blended format.
       </p>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
         {formats.map((format) => {
+          const Icon = format.icon;
           const active = questionFormat === format.value;
 
           return (
@@ -54,27 +55,35 @@ export default function QuestionFormatSelector() {
               key={format.value}
               type="button"
               onClick={() => setQuestionFormat(format.value)}
-              className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
+              className={`flex flex-col justify-between rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-violet-500 bg-violet-500/10"
-                  : "border-slate-700 bg-slate-950 hover:border-violet-500/60"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
               }`}
             >
-              <div className="mb-4 text-violet-400">
-                {format.icon}
+              <div>
+                <div
+                  className={`inline-flex rounded-xl p-2.5 transition-colors ${
+                    active
+                      ? "bg-accent text-on-accent shadow-xs"
+                      : "bg-accent/10 text-accent group-hover:bg-accent/20"
+                  }`}
+                >
+                  <Icon size={20} />
+                </div>
+
+                <h3 className="mt-3.5 text-sm sm:text-base font-bold text-heading">
+                  {format.title}
+                </h3>
+
+                <p className="mt-1 text-xs leading-relaxed text-body-muted">
+                  {format.description}
+                </p>
               </div>
-
-              <h3 className="font-semibold text-white">
-                {format.title}
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-400">
-                {format.description}
-              </p>
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Lightbulb, Loader2 } from "lucide-react";
+import { Lightbulb, Loader2, Sparkles } from "lucide-react";
 import { useInterview } from "@/context/InterviewContext";
 
 export default function HintButton() {
   const { state } = useInterview();
 
-  const currentQuestion =
-    state.questions[state.currentQuestion];
+  const currentQuestion = state.questions[state.currentQuestion];
 
   const [loading, setLoading] = useState(false);
   const [hint, setHint] = useState("");
@@ -30,9 +29,7 @@ export default function HintButton() {
 
       const response = await fetch("/api/interview/hint", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           question: currentQuestion.question,
           interviewType: state.interviewType,
@@ -57,11 +54,11 @@ export default function HintButton() {
   };
 
   return (
-    <section className="mt-6 rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5">
+    <section className="rounded-3xl border border-accent/30 bg-accent/5 p-5 shadow-sm">
       <button
         onClick={generateHint}
         disabled={loading || !!hint}
-        className="flex items-center gap-3 rounded-xl bg-amber-500 px-5 py-3 font-medium text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex items-center gap-3 rounded-xl border border-accent/40 bg-accent/10 px-5 py-3 font-medium text-accent transition hover:bg-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? (
           <>
@@ -77,12 +74,12 @@ export default function HintButton() {
       </button>
 
       {hint && (
-        <div className="mt-5 rounded-2xl border border-amber-500/30 bg-slate-950 p-4">
-          <h3 className="mb-2 font-semibold text-amber-400">
-            💡 AI Hint
+        <div className="mt-5 rounded-2xl border border-accent/30 bg-base p-5">
+          <h3 className="mb-2 flex items-center gap-2 font-semibold text-accent">
+            <Sparkles size={16} />
+            AI Hint
           </h3>
-
-          <p className="leading-7 text-slate-300">
+          <p className="leading-7 text-heading">
             {hint}
           </p>
         </div>

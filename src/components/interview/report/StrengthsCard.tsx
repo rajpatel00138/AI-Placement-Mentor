@@ -10,8 +10,8 @@ export default function StrengthsCard() {
   const strengths = state.evaluation?.strengths ?? [];
 
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
-      <h2 className="text-2xl font-bold text-white">
+    <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+      <h2 className="text-2xl font-bold text-heading">
         Strengths
       </h2>
 
@@ -20,20 +20,22 @@ export default function StrengthsCard() {
           strengths.map((item) => (
             <div
               key={item}
-              className="flex items-center gap-3 rounded-xl bg-slate-950 p-4"
+              className="flex items-center gap-3 rounded-xl border border-border bg-base p-4"
             >
-              <CheckCircle2
-                className="text-green-400"
-                size={20}
-              />
+              <div className="flex-shrink-0 rounded-lg bg-success/10 p-1.5">
+                <CheckCircle2
+                  className="text-success"
+                  size={18}
+                />
+              </div>
 
-              <span className="text-slate-300">
+              <span className="text-heading">
                 {item}
               </span>
             </div>
           ))
         ) : (
-          <div className="rounded-xl bg-slate-950 p-4 text-slate-400">
+          <div className="rounded-xl border border-border bg-base p-4 text-body-muted">
             No strengths available.
           </div>
         )}

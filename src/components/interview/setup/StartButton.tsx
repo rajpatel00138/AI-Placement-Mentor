@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, PlayCircle } from "lucide-react";
-
 import { useInterview } from "@/context/InterviewContext";
 
 export default function StartButton() {
@@ -73,31 +72,21 @@ export default function StartButton() {
           index: number
         ) => ({
           id: index + 1,
-
           type: q.type ?? "descriptive",
-
           question: q.question,
-
           options: q.options,
-
           correctAnswer: q.correctAnswer,
-
           explanation: q.explanation,
-
           difficulty: state.difficulty,
-
           expectedTime: q.expectedTime ?? 3,
         })
       );
 
       setQuestions(questions);
-
       startInterview();
-
       router.push("/dashboard/interview/session");
     } catch (error) {
       console.error(error);
-
       alert(
         error instanceof Error
           ? error.message
@@ -110,19 +99,20 @@ export default function StartButton() {
 
   return (
     <button
+      type="button"
       onClick={handleStart}
       disabled={loading}
-      className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-4 font-semibold text-white transition-all duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+      className="flex w-full items-center justify-center gap-3 rounded-2xl bg-accent hover:bg-accent-hover px-6 py-4 font-bold text-on-accent transition-all duration-200 shadow-sm active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 cursor-pointer"
     >
       {loading ? (
         <>
           <Loader2 className="animate-spin" size={20} />
-          Preparing AI Interview...
+          <span>Preparing AI Interview...</span>
         </>
       ) : (
         <>
           <PlayCircle size={20} />
-          Start AI Interview
+          <span>Start AI Interview</span>
         </>
       )}
     </button>

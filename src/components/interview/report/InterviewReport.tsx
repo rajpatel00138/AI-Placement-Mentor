@@ -13,11 +13,11 @@ export default function InterviewReport() {
     <div className="space-y-6">
 
       <div>
-        <h1 className="text-4xl font-bold text-white">
+        <h1 className="text-4xl font-bold text-heading">
           Interview Report
         </h1>
 
-        <p className="mt-2 text-slate-400">
+        <p className="mt-2 text-body-muted">
           Review your interview performance and identify areas for improvement.
         </p>
       </div>

@@ -24,3 +24,4 @@ export default async function StartInterviewPage({
 
   return <InterviewSetup initialInterviewType={initialInterviewType} />;
 }
+

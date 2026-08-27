@@ -9,21 +9,22 @@ export default function RecommendationCard() {
   const recommendedTopics =
     state.evaluation?.recommendedTopics ?? [];
 
-  const priorityColors = {
-    High: "bg-red-500/15 text-red-300 border-red-500/30",
-    Medium: "bg-yellow-500/15 text-yellow-300 border-yellow-500/30",
-    Low: "bg-green-500/15 text-green-300 border-green-500/30",
+  // Palette-consistent priority badge styles using theme tokens
+  const priorityStyles = {
+    High: "bg-error/10 text-error border border-error/30",
+    Medium: "bg-warning/10 text-warning border border-warning/30",
+    Low: "bg-success/10 text-success border border-success/30",
   };
 
   return (
-    <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-6">
+    <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <BookOpen
-          className="text-blue-400"
+          className="text-accent-secondary"
           size={24}
         />
 
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-heading">
           Recommended Topics
         </h2>
       </div>
@@ -33,23 +34,23 @@ export default function RecommendationCard() {
           recommendedTopics.map((item, index) => (
             <div
               key={`${item.topic}-${index}`}
-              className="flex items-center justify-between rounded-2xl bg-slate-950 p-4"
+              className="flex items-center justify-between rounded-2xl border border-border bg-base p-4"
             >
               <div>
-                <p className="font-semibold text-white">
+                <p className="font-semibold text-heading">
                   {item.topic}
                 </p>
 
-                <p className="mt-1 text-sm text-slate-400">
+                <p className="mt-1 text-sm text-body-muted">
                   Recommended for focused practice
                 </p>
               </div>
 
               <span
-                className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-                  priorityColors[
-                    item.priority as keyof typeof priorityColors
-                  ] ?? priorityColors.Medium
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  priorityStyles[
+                    item.priority as keyof typeof priorityStyles
+                  ] ?? priorityStyles.Medium
                 }`}
               >
                 {item.priority}
@@ -57,7 +58,7 @@ export default function RecommendationCard() {
             </div>
           ))
         ) : (
-          <div className="rounded-xl bg-slate-950 p-4 text-slate-400">
+          <div className="rounded-xl border border-border bg-base p-4 text-body-muted">
             No recommendedTopics available.
           </div>
         )}
