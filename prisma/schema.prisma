@@ -56,7 +56,6 @@ model User {
 
   // Relations
   chatSessions      ChatSession[]
-  notes             Note[]
   activityLogs      ActivityLog[]
   dsaSolves         DsaSolve[]
   roadmapProgress   RoadmapProgress[]
@@ -98,26 +97,11 @@ model ChatMessage {
   createdAt DateTime    @default(now())
 }
 
-model Note {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String   @default("Untitled Note")
-  content   String   @default("")
-  tags      String[] @default([])
-  isPinned  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, updatedAt])
-  @@index([userId, isPinned])
-}
-
 model ActivityLog {
   id             String   @id @default(cuid())
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type           String   // "DSA_PROBLEM_SOLVED", "RESUME_ANALYZED", "MOCK_INTERVIEW_COMPLETED", "ROADMAP_TOPIC_COMPLETED", "NOTE_CREATED", "CHAT_SESSION_CREATED"
+  type           String   // "DSA_PROBLEM_SOLVED", "RESUME_ANALYZED", "MOCK_INTERVIEW_COMPLETED", "ROADMAP_TOPIC_COMPLETED", "CHAT_SESSION_CREATED"
   title          String
   detail         String?
   readinessAfter Int?

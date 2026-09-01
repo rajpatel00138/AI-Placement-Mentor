@@ -25,6 +25,7 @@ export interface InterviewQuestion {
   id: number;
   type: "descriptive" | "mcq";
   question: string;
+  codeSnippet?: string;
   options?: string[];
   correctAnswer?: string;
   explanation?: string;
@@ -46,6 +47,7 @@ interface InterviewState {
 
   language: string;
   questionFormat: QuestionFormat;
+  numberOfQuestions: number;
 
   isInterviewStarted: boolean;
   isInterviewFinished: boolean;
@@ -58,6 +60,7 @@ interface InterviewContextType {
   setDifficulty: (difficulty: Difficulty) => void;
   setCompany: (company: string) => void;
   setDuration: (duration: number) => void;
+  setNumberOfQuestions: (count: number) => void;
   setQuestions: (questions: InterviewQuestion[]) => void;
   setLanguage: (language: string) => void;
   setQuestionFormat: (format: QuestionFormat) => void;
@@ -66,6 +69,7 @@ interface InterviewContextType {
 
   nextQuestion: () => void;
   previousQuestion: () => void;
+  goToQuestion: (index: number) => void;
 
   startInterview: () => void;
   finishInterview: () => void;
@@ -135,6 +139,7 @@ export function InterviewProvider({
 
     language: "English",
     questionFormat: "mixed",
+    numberOfQuestions: 5,
 
     isInterviewStarted: true,
     isInterviewFinished: false,
@@ -181,6 +186,16 @@ export function InterviewProvider({
     });
   };
 
+  const goToQuestion = (index: number) => {
+    setState((prev) => {
+      if (prev.questions.length === 0) return prev;
+      return {
+        ...prev,
+        currentQuestion: Math.max(0, Math.min(index, prev.questions.length - 1)),
+      };
+    });
+  };
+
   const startInterview = () => {
     setState((prev) => ({
       ...prev,
@@ -208,6 +223,7 @@ export function InterviewProvider({
 
       language: "English",
       questionFormat: "mixed",
+      numberOfQuestions: 5,
 
       isInterviewStarted: true,
       isInterviewFinished: false,
@@ -223,6 +239,7 @@ export function InterviewProvider({
         setDifficulty: (v) => update("difficulty", v),
         setCompany: (v) => update("company", v),
         setDuration: (v) => update("duration", v),
+        setNumberOfQuestions: (v) => update("numberOfQuestions", v),
         setQuestions: (v) => update("questions", v),
         setLanguage: (v) => update("language", v),
         setQuestionFormat: (v) => update("questionFormat", v),
@@ -231,6 +248,7 @@ export function InterviewProvider({
 
         nextQuestion,
         previousQuestion,
+        goToQuestion,
 
         startInterview,
         finishInterview,

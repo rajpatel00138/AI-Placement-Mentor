@@ -6,13 +6,14 @@ export type InterviewType =
   | "os"
   | "cn"
   | "system-design"
-  | "aptitude";
+  | "aptitude"
+  | "pseudocode"
+  | "pseudo-code";
 
 export type Difficulty =
   | "easy"
   | "medium"
   | "hard";
-
 export interface InterviewQuestionAnswer {
   question: string;
   answer: string;

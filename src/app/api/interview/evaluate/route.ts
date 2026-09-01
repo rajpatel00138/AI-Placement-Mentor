@@ -17,6 +17,31 @@ export async function POST(req: NextRequest) {
       questions,
     } = await req.json();
 
+    const isPseudocode =
+      interviewType === "pseudocode" || interviewType === "pseudo-code";
+
+    let totalMcqs = 0;
+    let correctMcqs = 0;
+
+    questions.forEach((q: any) => {
+      if (q.type === "mcq" || (isPseudocode && q.correctAnswer)) {
+        totalMcqs++;
+        const candidateAns = (q.answer || "").trim().toLowerCase();
+        const correctAns = (q.correctAnswer || "").trim().toLowerCase();
+        if (
+          candidateAns &&
+          (candidateAns === correctAns ||
+            candidateAns.includes(correctAns) ||
+            correctAns.includes(candidateAns))
+        ) {
+          correctMcqs++;
+        }
+      }
+    });
+
+    const mcqScorePercent =
+      totalMcqs > 0 ? Math.round((correctMcqs / totalMcqs) * 100) : null;
+
     const prompt = `
 You are a Senior FAANG Technical Interview Evaluator.
 
@@ -32,11 +57,11 @@ Do NOT wrap inside \`\`\`.
 Return exactly this structure:
 
 {
-  "overallScore":0,
-  "communication":0,
-  "technicalKnowledge":0,
-  "problemSolving":0,
-  "confidence":0,
+  "overallScore": ${mcqScorePercent ?? 0},
+  "communication": ${mcqScorePercent !== null ? Math.min(10, Math.round(mcqScorePercent / 10)) : 0},
+  "technicalKnowledge": ${mcqScorePercent !== null ? Math.min(10, Math.round(mcqScorePercent / 10)) : 0},
+  "problemSolving": ${mcqScorePercent !== null ? Math.min(10, Math.round(mcqScorePercent / 10)) : 0},
+  "confidence": ${mcqScorePercent !== null ? Math.min(10, Math.round(mcqScorePercent / 10)) : 0},
 
   "strengths":[
     ""
@@ -69,19 +94,19 @@ Return exactly this structure:
 Scoring Rules
 
 Overall Score:
-0-100
+0-100 (Objective MCQ accuracy is ${correctMcqs} / ${totalMcqs} = ${mcqScorePercent ?? 0}%)
 
 Communication:
-How clearly the candidate explained.
+How clearly the candidate reasoned.
 
 Technical Knowledge:
-Accuracy of concepts.
+Accuracy on pseudocode algorithms, Big-O complexity, and logic patterns.
 
 Problem Solving:
-Reasoning and approach.
+Reasoning on tracing, loop invariants, and bug hunting.
 
 Confidence:
-Based on answer quality and completeness.
+Based on answer accuracy and completeness.
 
 Strengths:
 Give 3-6 specific strengths.
@@ -90,39 +115,42 @@ Weaknesses:
 Give 3-6 specific weaknesses.
 
 Overall overallFeedback:
-Write 5-8 sentences.
+Write 5-8 sentences analyzing their algorithmic reasoning.
 
 Hiring Recommendation:
 
 status must be one of:
-
 "Strong Hire"
 "Hire"
 "Lean Hire"
 "No Hire"
 
 confidence must be:
-
 High
 Medium
 Low
 
 Recommended Topics:
-
 Return 5 topics.
 
 Priority must be:
-
 High
 Medium
 Low
 
 Suggestions:
-
 Return 5 actionable suggestions.
 
 Interview Type:
 ${interviewType}
+${
+  isPseudocode || totalMcqs > 0
+    ? `Special Evaluation Rule for MCQ Assessment:
+- The candidate took an objective MCQ assessment (${correctMcqs} / ${totalMcqs} correct, ${mcqScorePercent}%).
+- Anchored overallScore: ${mcqScorePercent}%.
+- Highlight their performance on pseudocode tracing, Big-O complexity, and edge-case bug detection.`
+    : ""
+}
 
 Difficulty:
 ${difficulty}
@@ -135,11 +163,13 @@ Questions and Candidate Answers:
 ${questions
   .map(
     (q: any, index: number) => `
-Question ${index + 1}
+Question ${index + 1} (${q.type === "mcq" ? "MCQ" : "Descriptive"})
 ${q.question}
 
-Candidate Answer:
-${q.answer}
+Candidate Selected Answer:
+${q.answer || "No answer chosen"}
+${q.correctAnswer ? `Correct Key: ${q.correctAnswer}` : ""}
+${q.explanation ? `Explanation: ${q.explanation}` : ""}
 `
   )
   .join("\n")}
@@ -163,13 +193,16 @@ ${q.answer}
 
     let evaluation;
 
-      try {
-        evaluation = JSON.parse(cleaned);
-      } catch {
-        throw new Error(
-          "Gemini returned invalid evaluation JSON."
-        );
+    try {
+      evaluation = JSON.parse(cleaned);
+      if (mcqScorePercent !== null) {
+        evaluation.overallScore = mcqScorePercent;
       }
+    } catch {
+      throw new Error(
+        "Gemini returned invalid evaluation JSON."
+      );
+    }
 
     return NextResponse.json({
       success: true,

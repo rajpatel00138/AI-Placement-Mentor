@@ -896,7 +896,7 @@ export default function SettingsPage() {
                           <h3 className="text-sm font-bold text-primary">Delete Student Account</h3>
                           <p className="text-xs text-muted leading-relaxed mt-1">
                             Permanently removes your student profile, ATS resume scores, diagnostic placement
-                            analytics, practice notes, and all AI mock interview records. This action cannot be
+                            analytics, and all AI mock interview records. This action cannot be
                             reversed.
                           </p>
                         </div>

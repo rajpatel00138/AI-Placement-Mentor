@@ -32,6 +32,7 @@ export default function StartButton() {
 
       const response = await fetch("/api/interview/questions", {
         method: "POST",
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
         },
@@ -41,7 +42,8 @@ export default function StartButton() {
           company: state.company,
           language: state.language,
           questionFormat: state.questionFormat,
-          numberOfQuestions: 5,
+          numberOfQuestions: state.numberOfQuestions || 5,
+          timestamp: Date.now(),
         }),
       });
 
@@ -64,6 +66,7 @@ export default function StartButton() {
           q: {
             type?: "descriptive" | "mcq";
             question: string;
+            codeSnippet?: string;
             options?: string[];
             correctAnswer?: string;
             explanation?: string;
@@ -74,11 +77,12 @@ export default function StartButton() {
           id: index + 1,
           type: q.type ?? "descriptive",
           question: q.question,
+          codeSnippet: q.codeSnippet,
           options: q.options,
           correctAnswer: q.correctAnswer,
           explanation: q.explanation,
           difficulty: state.difficulty,
-          expectedTime: q.expectedTime ?? 3,
+          expectedTime: q.expectedTime ?? 2,
         })
       );
 

@@ -12,7 +12,7 @@ const shouldUsePrisma = () => process.env.USE_PRISMA_PERSISTENCE === "true" || p
 
 /**
  * Normalizes a real database/registered user into a StudentAnalyticsRecord with live dynamic performance metrics.
- * Strictly omits private data (notes, chats, settings, password).
+ * Strictly omits private data (chats, settings, password).
  */
 export async function mapRegisteredUserToAnalytics(user: {
   id: string;

@@ -13,7 +13,6 @@ import {
   Compass,
   PieChart,
   MessageSquare,
-  NotebookPen,
   Settings,
   Sparkles,
   Search,
@@ -47,7 +46,6 @@ const iconMap: Record<string, any> = {
   Compass,
   PieChart,
   MessageSquare,
-  NotebookPen,
   Settings,
 };
 

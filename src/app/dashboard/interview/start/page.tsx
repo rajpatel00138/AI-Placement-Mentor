@@ -10,6 +10,8 @@ const interviewTypes: InterviewType[] = [
   "cn",
   "system-design",
   "aptitude",
+  "pseudocode",
+  "pseudo-code",
 ];
 
 export default async function StartInterviewPage({

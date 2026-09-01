@@ -24,43 +24,115 @@ function CodeBlock({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const lines = value.split("\n");
+  const showLineNumbers = lines.length > 1;
+
   return (
-    <div className="my-2.5 sm:my-3 w-full max-w-full min-w-0 overflow-hidden rounded-xl border border-border bg-[#121820] text-gray-100 shadow-sm font-mono text-[11px] sm:text-xs">
+    <div className="my-3 w-full max-w-full min-w-0 overflow-hidden rounded-xl border border-border/80 bg-[#121820] text-gray-100 shadow-md font-mono text-xs">
       {/* Code Header */}
-      <div className="flex items-center justify-between border-b border-border/40 bg-[#18222c] px-3 py-1.5 text-muted shrink-0">
-        <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-gray-300 truncate">
-          <Terminal className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-accent shrink-0" />
-          <span className="truncate">{language || "code"}</span>
+      <div className="flex items-center justify-between border-b border-border/50 bg-[#18222c] px-3.5 py-2 text-muted shrink-0">
+        <div className="flex items-center gap-2 text-xs font-semibold text-gray-200 truncate">
+          <Terminal className="h-3.5 w-3.5 text-accent shrink-0" />
+          <span className="truncate uppercase tracking-wider text-[11px] text-accent font-mono">{language || "pseudocode"}</span>
         </div>
         <button
           onClick={handleCopy}
           type="button"
-          className="flex items-center gap-1 rounded-md px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-gray-300 hover:bg-white/10 hover:text-white transition cursor-pointer shrink-0 ml-2"
+          className="flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium text-gray-300 hover:bg-white/10 hover:text-white transition cursor-pointer shrink-0 ml-2"
           title="Copy code"
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3 text-emerald-400" />
-              <span className="text-emerald-400">Copied</span>
+              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              <span className="text-emerald-400 text-xs">Copied</span>
             </>
           ) : (
             <>
-              <Copy className="h-3 w-3" />
-              <span>Copy</span>
+              <Copy className="h-3.5 w-3.5" />
+              <span className="text-xs">Copy</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Code Body with contained horizontal scrolling */}
-      <pre className="overflow-x-auto p-2.5 sm:p-3.5 leading-relaxed selection:bg-accent/40 w-full max-w-full font-mono text-[11px] sm:text-xs">
-        <code className="break-normal whitespace-pre inline-block min-w-full">{value}</code>
-      </pre>
+      {/* Code Body with line numbers and horizontal scrolling */}
+      <div className="overflow-x-auto p-3.5 leading-relaxed selection:bg-accent/40 w-full max-w-full font-mono text-xs sm:text-[13px]">
+        {showLineNumbers ? (
+          <table className="w-full border-collapse">
+            <tbody>
+              {lines.map((line, idx) => (
+                <tr key={idx} className="hover:bg-white/5 transition-colors">
+                  <td className="select-none pr-4 text-right text-gray-500 text-xs w-8 align-top font-mono">
+                    {idx + 1}
+                  </td>
+                  <td className="whitespace-pre font-mono text-gray-100 align-top">
+                    {line || " "}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <pre className="whitespace-pre font-mono text-gray-100">
+            <code>{value}</code>
+          </pre>
+        )}
+      </div>
     </div>
   );
 }
 
+export function normalizePseudocode(content: string): string {
+  if (!content) return "";
+  if (content.includes("```")) return content;
+
+  const lines = content.split("\n");
+  let inCode = false;
+  let codeBuffer: string[] = [];
+  const result: string[] = [];
+
+  const isCodeLine = (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    return (
+      /^(FUNCTION|PROCEDURE|ALGORITHM|CLASS|METHOD)\b/i.test(trimmed) ||
+      /^((SET|LET|DECLARE|INIT|VAR)\s+[a-zA-Z0-9_]+)/i.test(trimmed) ||
+      /^(FOR|WHILE|DO|REPEAT|UNTIL|FOREACH)\b/i.test(trimmed) ||
+      /^(IF|ELSE IF|ELSE|THEN|ELIF|SWITCH|CASE)\b/i.test(trimmed) ||
+      /^(RETURN|OUTPUT|PRINT|YIELD|BREAK|CONTINUE)\b/i.test(trimmed) ||
+      (inCode && (line.startsWith("  ") || line.startsWith("\t") || trimmed.startsWith("END") || trimmed === "}"))
+    );
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (isCodeLine(line)) {
+      inCode = true;
+      codeBuffer.push(line);
+    } else {
+      if (inCode) {
+        if (line.trim() === "" && i + 1 < lines.length && isCodeLine(lines[i + 1])) {
+          codeBuffer.push(line);
+          continue;
+        }
+        result.push("```pseudocode\n" + codeBuffer.join("\n") + "\n```");
+        codeBuffer = [];
+        inCode = false;
+      }
+      result.push(line);
+    }
+  }
+
+  if (inCode && codeBuffer.length > 0) {
+    result.push("```pseudocode\n" + codeBuffer.join("\n") + "\n```");
+  }
+
+  return result.join("\n");
+}
+
 export default function MarkdownContent({ content, isStreaming }: MarkdownContentProps) {
+  const processedContent = normalizePseudocode(content || "");
+
   return (
     <div className="prose-chat text-xs sm:text-sm leading-relaxed break-words w-full max-w-full min-w-0 overflow-hidden">
       <ReactMarkdown
@@ -81,7 +153,7 @@ export default function MarkdownContent({ content, isStreaming }: MarkdownConten
             </h3>
           ),
           p: ({ children }) => (
-            <p className="mb-2 sm:mb-2.5 last:mb-0 text-primary leading-relaxed break-words">{children}</p>
+            <p className="mb-2 sm:mb-2.5 last:mb-0 text-primary leading-relaxed break-words whitespace-pre-wrap">{children}</p>
           ),
           ul: ({ children }) => (
             <ul className="my-1.5 sm:my-2 ml-3.5 sm:ml-4 list-disc space-y-0.5 sm:space-y-1 text-primary marker:text-accent">
@@ -136,7 +208,7 @@ export default function MarkdownContent({ content, isStreaming }: MarkdownConten
             if (match || isMultiLine) {
               return (
                 <CodeBlock
-                  language={match ? match[1] : ""}
+                  language={match ? match[1] : "pseudocode"}
                   value={stringCode}
                 />
               );
@@ -153,7 +225,7 @@ export default function MarkdownContent({ content, isStreaming }: MarkdownConten
           },
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
 
       {/* Blinking typing cursor while streaming */}

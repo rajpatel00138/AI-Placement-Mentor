@@ -4,7 +4,7 @@ import { StudentDeepDiveProfile } from "./types";
 
 /**
  * Compiles a read-only multi-module diagnostic profile for a student using live backend records.
- * Strictly excludes private notes and chat history.
+ * Strictly excludes private chat history.
  */
 export async function getStudentDeepDiveProfile(
   studentIdOrEmail: string

@@ -333,7 +333,7 @@ export async function deleteUserAccount(
         return { success: false, error: "User not found." };
       }
 
-      // Cascade is handled in schema for Notes and ChatSessions
+      // Cascade is handled in schema for ChatSessions
       await (prisma as any).user.delete({
         where: { id: user.id },
       });

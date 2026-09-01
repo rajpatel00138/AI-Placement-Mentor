@@ -1,0 +1,5 @@
+-- DropForeignKey
+ALTER TABLE IF EXISTS "Note" DROP CONSTRAINT IF EXISTS "Note_userId_fkey";
+
+-- DropTable
+DROP TABLE IF EXISTS "Note" CASCADE;

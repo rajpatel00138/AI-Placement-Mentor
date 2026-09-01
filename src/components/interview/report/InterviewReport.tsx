@@ -6,6 +6,7 @@ import StrengthsCard from "./StrengthsCard";
 import WeaknessesCard from "./WeaknessesCard";
 import AIInsights from "./AIInsights";
 import RecommendationCard from "./RecommendationCard";
+import QuestionsReview from "./QuestionsReview";
 import ReportActions from "./ReportActions";
 
 export default function InterviewReport() {
@@ -29,6 +30,7 @@ export default function InterviewReport() {
             <WeaknessesCard />
         </div>
         <AIInsights />
+        <QuestionsReview />
         <RecommendationCard />
         <ReportActions />
 

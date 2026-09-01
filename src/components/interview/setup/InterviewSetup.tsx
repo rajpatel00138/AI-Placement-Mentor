@@ -16,7 +16,7 @@ export default function InterviewSetup({
 }: {
   initialInterviewType?: InterviewType;
 }) {
-  const { state, setInterviewType, setLanguage } = useInterview();
+  const { state, setInterviewType, setLanguage, setNumberOfQuestions } = useInterview();
 
   useEffect(() => {
     if (initialInterviewType) {
@@ -74,13 +74,16 @@ export default function InterviewSetup({
             </div>
 
             <select
-              defaultValue="5 Questions"
+              value={state.numberOfQuestions || 5}
+              onChange={(e) => setNumberOfQuestions(Number(e.target.value))}
               className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-heading outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
             >
-              <option value="5 Questions" className="bg-surface text-heading">5 Questions (Recommended)</option>
-              <option value="10 Questions" className="bg-surface text-heading">10 Questions</option>
-              <option value="15 Questions" className="bg-surface text-heading">15 Questions</option>
-              <option value="20 Questions" className="bg-surface text-heading">20 Questions</option>
+              <option value="5" className="bg-surface text-heading">5 Questions (Recommended)</option>
+              <option value="10" className="bg-surface text-heading">10 Questions</option>
+              <option value="15" className="bg-surface text-heading">15 Questions</option>
+              <option value="20" className="bg-surface text-heading">20 Questions</option>
+              <option value="50" className="bg-surface text-heading">50 Questions</option>
+              <option value="100" className="bg-surface text-heading">100 Questions</option>
             </select>
           </div>
 

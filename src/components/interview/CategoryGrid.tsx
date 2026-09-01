@@ -10,6 +10,7 @@ import {
   Network,
   Boxes,
   Calculator,
+  Code2,
   Building2,
   ArrowRight,
 } from "lucide-react";
@@ -32,6 +33,12 @@ const categories = [
     type: "dsa",
     description: "Algorithms, complexity analysis & live coding explanations",
     icon: BrainCircuit,
+  },
+  {
+    title: "Pseudo Code",
+    type: "pseudocode",
+    description: "Algorithmic thinking, step-by-step logic & control flow",
+    icon: Code2,
   },
   {
     title: "Database Management",

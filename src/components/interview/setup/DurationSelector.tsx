@@ -24,6 +24,16 @@ const durations = [
     title: "60 Minutes",
     subtitle: "Comprehensive Simulation",
   },
+  {
+    id: 90,
+    title: "90 Minutes",
+    subtitle: "Extended Marathon (50+ Qs)",
+  },
+  {
+    id: 120,
+    title: "120 Minutes",
+    subtitle: "Full Scale Assessment (100 Qs)",
+  },
 ];
 
 export default function DurationSelector() {

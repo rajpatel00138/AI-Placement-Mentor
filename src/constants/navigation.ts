@@ -6,6 +6,5 @@ export const navigationItems = [
   { label: "Roadmap", href: "/dashboard/roadmap", icon: "Compass" },
   { label: "Analytics", href: "/dashboard/analytics", icon: "PieChart" },
   { label: "AI Chat", href: "/dashboard/ai-chat", icon: "MessageSquare" },
-  { label: "Notes", href: "/dashboard/notes", icon: "NotebookPen" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ];

@@ -9,6 +9,7 @@ import {
   Network,
   Boxes,
   Calculator,
+  Code2,
 } from "lucide-react";
 
 import {
@@ -34,6 +35,12 @@ const interviewTypes = [
     title: "DSA & Algorithms",
     description: "Live coding & algorithm challenges",
     icon: BrainCircuit,
+  },
+  {
+    id: "pseudocode",
+    title: "Pseudo Code",
+    description: "Algorithmic thinking & step-by-step logic",
+    icon: Code2,
   },
   {
     id: "dbms",
