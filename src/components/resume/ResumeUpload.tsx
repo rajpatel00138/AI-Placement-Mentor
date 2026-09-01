@@ -20,7 +20,7 @@ export default function ResumeUpload() {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
 
-  const MAX_SIZE = 5 * 1024 * 1024;
+  const MAX_SIZE = 4.5 * 1024 * 1024;
 
   const handleFile = (selectedFile: File) => {
     setError("");
@@ -29,15 +29,21 @@ export default function ResumeUpload() {
     const validTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain",
     ];
 
-    if (!validTypes.includes(selectedFile.type) && !selectedFile.name.endsWith(".pdf") && !selectedFile.name.endsWith(".docx")) {
-      setError("Only PDF and DOCX files are allowed.");
+    if (
+      !validTypes.includes(selectedFile.type) &&
+      !selectedFile.name.endsWith(".pdf") &&
+      !selectedFile.name.endsWith(".docx") &&
+      !selectedFile.name.endsWith(".txt")
+    ) {
+      setError("Only PDF, DOCX, and TXT files are allowed.");
       return;
     }
 
     if (selectedFile.size > MAX_SIZE) {
-      setError("File size must be less than 5 MB.");
+      setError("File size exceeds the 4.5 MB limit. Please upload a smaller resume file.");
       return;
     }
 
@@ -83,63 +89,27 @@ export default function ResumeUpload() {
       setError("");
       setAnalysis(null);
 
-      let parsedAnalysis: any = null;
+      const formData = new FormData();
+      formData.append("file", file);
 
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
+      const response = await fetch("/api/resume/analyze", {
+        method: "POST",
+        body: formData,
+      });
 
-        const response = await fetch("http://127.0.0.1:8000/analyze", {
-          method: "POST",
-          body: formData,
-        });
+      const data = await response.json();
 
-        if (response.ok) {
-          const text = await response.text();
-          const data = JSON.parse(text);
-          if (data.success && data.analysis) {
-            parsedAnalysis = data.analysis;
-          }
-        }
-      } catch (backendErr) {
-        console.warn("FastAPI analyzer offline, generating client analysis:", backendErr);
+      if (!response.ok || !data.success || !data.analysis) {
+        throw new Error(data.error || "Failed to analyze resume. Please try another file.");
       }
 
-      // If backend was not reached, generate structured ATS report
-      if (!parsedAnalysis) {
-        const baseScore = Math.floor(75 + Math.random() * 15);
-        parsedAnalysis = {
-          overall_score: baseScore,
-          ats_compatibility: "High",
-          summary: `Strong candidate profile for software engineering roles. Resume structure and technical keywords match industry benchmarks for ${file.name}.`,
-          sections: {
-            contact_info: { score: 95, status: "Good" },
-            education: { score: 90, status: "Good" },
-            skills: { score: baseScore, status: "Good" },
-            experience: { score: Math.max(70, baseScore - 5), status: "Average" },
-            projects: { score: Math.min(95, baseScore + 8), status: "Good" },
-          },
-          skills: ["JavaScript", "TypeScript", "React", "Node.js", "SQL", "Git", "DSA", "Problem Solving"],
-          weaknesses: ["Add quantitative impact metrics in project bullets", "Expand unit testing keywords"],
-          suggestions: [
-            "Include measurable business results (% latency reduced, % traffic handled).",
-            "Ensure consistency in date formatting across all experience entries.",
-          ],
-        };
-      }
+      setAnalysis(data.analysis);
 
-      setAnalysis(parsedAnalysis);
-
-      const computedAtsScore = parsedAnalysis.overall_score || parsedAnalysis.atsScore || 80;
-      await syncResumeRecord(
-        file.name,
-        computedAtsScore,
-        parsedAnalysis.summary || "",
-        parsedAnalysis.skills || [],
-        parsedAnalysis.weaknesses || []
-      );
+      // Dispatch reactive update event to refresh Dashboard metrics across views
+      window.dispatchEvent(new Event("activityUpdated"));
     } catch (err: any) {
-      setError(err.message || "Failed to analyze resume.");
+      console.error("Resume analysis client error:", err);
+      setError(err.message || "Failed to analyze resume. Please verify file format and try again.");
     } finally {
       setLoading(false);
     }
