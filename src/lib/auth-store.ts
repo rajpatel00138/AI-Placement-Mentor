@@ -82,6 +82,26 @@ function ensureSeeded() {
       createdAt: new Date(),
     });
   }
+
+  // 3. Real / Google Student Account (Monster)
+  if (!globalWithUsers.__placementMentorUsers.has("rp286895@gmail.com")) {
+    globalWithUsers.__placementMentorUsers.set("rp286895@gmail.com", {
+      id: "usr_rp286895",
+      name: "Monster",
+      email: "rp286895@gmail.com",
+      password: defaultPasswordHash,
+      image: null,
+      role: "student",
+      college: "Apex Institute of Technology",
+      branch: "CSE",
+      batch: "2025-A",
+      graduationYear: 2025,
+      targetRole: "Full Stack Engineer",
+      targetCompany: "Google",
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+    });
+  }
 }
 
 ensureSeeded();

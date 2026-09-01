@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { findUserByEmailFallback, findUserByIdFallback } from "@/lib/auth-store";
 
 export interface UserPerformanceMetrics {
   dsaScore: number;
@@ -412,8 +413,24 @@ export async function getUserRoadmapProgress(userId: string): Promise<Record<str
   return result;
 }
 
+async function resolveUserKeys(userId: string): Promise<string[]> {
+  const keys = new Set<string>([userId]);
+  if (userId.includes("@")) {
+    const user = await findUserByEmailFallback(userId);
+    if (user?.id) keys.add(user.id);
+  } else {
+    const user = await findUserByIdFallback(userId);
+    if (user?.email) {
+      keys.add(user.email);
+      keys.add(user.email.toLowerCase().trim());
+    }
+  }
+  return Array.from(keys);
+}
+
 // 8. User Performance Calculation (Single Source of Truth)
 export async function getUserPerformance(userId: string): Promise<UserPerformanceMetrics> {
+  const userKeys = await resolveUserKeys(userId);
   let dsaSolvesList: Array<{ difficulty: string }> = [];
   let latestResumeRecord: { fileName: string; atsScore: number; summary?: string | null; skills: string[]; skillGaps: string[]; createdAt: Date } | null = null;
   let interviewRecordsList: Array<{ score: number }> = [];
@@ -423,11 +440,11 @@ export async function getUserPerformance(userId: string): Promise<UserPerformanc
   if (shouldUsePrisma()) {
     try {
       const [solves, resumes, interviews, roadmaps, logs] = await Promise.all([
-        prisma.dsaSolve.findMany({ where: { userId }, select: { difficulty: true } }),
-        prisma.resumeRecord.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 1 }),
-        prisma.interviewRecord.findMany({ where: { userId }, select: { score: true } }),
-        prisma.roadmapProgress.count({ where: { userId, completed: true } }),
-        prisma.activityLog.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 10 }),
+        prisma.dsaSolve.findMany({ where: { userId: { in: userKeys } }, select: { difficulty: true } }),
+        prisma.resumeRecord.findMany({ where: { userId: { in: userKeys } }, orderBy: { createdAt: "desc" }, take: 1 }),
+        prisma.interviewRecord.findMany({ where: { userId: { in: userKeys } }, select: { score: true } }),
+        prisma.roadmapProgress.count({ where: { userId: { in: userKeys }, completed: true } }),
+        prisma.activityLog.findMany({ where: { userId: { in: userKeys } }, orderBy: { createdAt: "desc" }, take: 10 }),
       ]);
 
       dsaSolvesList = solves;
@@ -440,22 +457,42 @@ export async function getUserPerformance(userId: string): Promise<UserPerformanc
     } catch (err) {
       console.warn("Prisma getUserPerformance fallback:", err);
     }
-  } else {
-    const store = getMemoryStore();
-    const solvesMap = store.dsaSolves.get(userId);
+  }
+
+  // Also merge from in-memory store
+  const store = getMemoryStore();
+  for (const k of userKeys) {
+    const solvesMap = store.dsaSolves.get(k);
     if (solvesMap) {
-      dsaSolvesList = Array.from(solvesMap.values()).map((s) => ({ difficulty: s.difficulty }));
+      for (const [probId, s] of solvesMap.entries()) {
+        if (!dsaSolvesList.some((existing: any) => existing.problemId === probId)) {
+          dsaSolvesList.push({ difficulty: s.difficulty, ...(s as any) });
+        }
+      }
     }
-    const resumes = store.resumeRecords.get(userId) || [];
-    if (resumes.length > 0) {
+    const resumes = store.resumeRecords.get(k) || [];
+    if (resumes.length > 0 && !latestResumeRecord) {
       latestResumeRecord = resumes[0];
     }
-    interviewRecordsList = store.interviewRecords.get(userId) || [];
-    const roadmapMap = store.roadmapProgress.get(userId);
-    if (roadmapMap) {
-      completedTopicsCount = Array.from(roadmapMap.values()).filter(Boolean).length;
+    const interviews = store.interviewRecords.get(k) || [];
+    if (interviews.length > 0) {
+      interviewRecordsList.push(...interviews);
     }
-    activitiesList = store.activityLogs.get(userId) || [];
+    const roadmapMap = store.roadmapProgress.get(k);
+    if (roadmapMap) {
+      completedTopicsCount = Math.max(
+        completedTopicsCount,
+        Array.from(roadmapMap.values()).filter(Boolean).length
+      );
+    }
+    const logs = store.activityLogs.get(k) || [];
+    if (logs.length > 0) {
+      for (const l of logs) {
+        if (!activitiesList.some((existing) => existing.id === l.id)) {
+          activitiesList.push(l);
+        }
+      }
+    }
   }
 
   // A. DSA Score: Weighted by difficulty (Target: 50 problems for 100%)

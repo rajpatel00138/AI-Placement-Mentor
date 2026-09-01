@@ -188,10 +188,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           image?: string | null;
         };
 
-        token.id = authUser.id as string;
-        token.role = (authUser.role as string) || "student";
-        token.name = authUser.name as string;
+        token.id = (authUser.id as string) || (token.id as string) || (token.sub as string);
+        token.role = (authUser.role as string) || (token.role as string) || "student";
+        token.name = (authUser.name as string) || (token.name as string);
         token.picture = authUser.image ?? token.picture;
+      }
+
+      if (token.email) {
+        const email = token.email.toLowerCase().trim();
+        const fallbackUser = await findUserByEmailFallback(email);
+        if (fallbackUser) {
+          token.id = fallbackUser.id;
+          token.role = fallbackUser.role;
+          token.name = fallbackUser.name || (token.name as string);
+        } else {
+          try {
+            const created = await createUserFallback({
+              name: (token.name as string) || "Student",
+              email,
+              image: (token.picture as string) || null,
+              role: "student",
+            });
+            token.id = created.id;
+            token.role = created.role;
+          } catch (createErr) {
+            console.warn("Could not auto-register fallback student in jwt callback:", createErr);
+          }
+        }
       }
 
       return token;
@@ -205,9 +228,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           image?: string | null;
         };
 
-        sessionUser.id = token.id as string;
+        sessionUser.id = (token.id as string) || (token.sub as string);
         sessionUser.role = (token.role as string) || "student";
-        sessionUser.name = token.name as string;
+        sessionUser.name = (token.name as string) || sessionUser.name;
         sessionUser.image = (token.picture as string) || sessionUser.image || null;
       }
 

@@ -148,22 +148,35 @@ export async function getRecruiterBatchAnalytics(
   colleges: { id: string; name: string; code?: string | null }[];
   totalMatches: number;
 }> {
-  let rawStudents: any[] = [];
+  const studentsMap = new Map<string, any>();
 
   if (shouldUsePrisma()) {
     try {
-      rawStudents = await prisma.user.findMany({
+      const prismaStudents = await prisma.user.findMany({
         where: { role: "student" },
         orderBy: { createdAt: "desc" },
       });
+      for (const s of prismaStudents) {
+        if (s.email) {
+          studentsMap.set(s.email.toLowerCase().trim(), s);
+        }
+      }
     } catch (err) {
       console.warn("Prisma error in getRecruiterBatchAnalytics, using store fallback:", err);
     }
   }
 
-  if (rawStudents.length === 0) {
-    rawStudents = await getAllRegisteredStudentsFallback();
+  const fallbackStudents = await getAllRegisteredStudentsFallback();
+  for (const s of fallbackStudents) {
+    if (s.email) {
+      const emailKey = s.email.toLowerCase().trim();
+      if (!studentsMap.has(emailKey)) {
+        studentsMap.set(emailKey, s);
+      }
+    }
   }
+
+  const rawStudents = Array.from(studentsMap.values());
 
   // Map each real student to diagnostic analytics record
   const mapped = await Promise.all(rawStudents.map(mapRegisteredUserToAnalytics));

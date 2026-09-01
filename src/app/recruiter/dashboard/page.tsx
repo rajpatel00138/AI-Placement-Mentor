@@ -160,7 +160,7 @@ export default function RecruiterDashboardPage() {
               </div>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-success">{placementReadyCount}</p>
-            <p className="mt-1 text-xs text-muted">{placementReadyPercentage}% with $\ge 70\%$ readiness</p>
+            <p className="mt-1 text-xs text-muted">{placementReadyPercentage}% with ≥ 70% readiness</p>
           </div>
 
           <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs">
@@ -213,7 +213,7 @@ export default function RecruiterDashboardPage() {
               }`}
             >
               <Award size={13} />
-              <span>Top Performers ($\ge 70\%$)</span>
+              <span>Top Performers (≥ 70%)</span>
             </button>
             <button
               onClick={() => setActiveTab("most_improved")}
