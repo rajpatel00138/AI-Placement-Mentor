@@ -39,6 +39,13 @@ async function main() {
   console.log("👔 Seeding recruiter & admin accounts...");
   const adminUsers = [
     {
+      name: "Talent Partner",
+      email: "recruiter@placementmentor.com",
+      role: "recruiter",
+      targetRole: "Talent Acquisition",
+      targetCompany: "Top Tech",
+    },
+    {
       name: "Global Recruiter",
       email: "recruiter@mentor.com",
       role: "recruiter",

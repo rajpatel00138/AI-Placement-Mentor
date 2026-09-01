@@ -8,6 +8,7 @@ import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter();
+  const [role, setRole] = useState<"student" | "recruiter">("student");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,7 @@ export default function SignupPage() {
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
 
     const payload = await response.json();
@@ -46,7 +47,11 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/dashboard");
+    if (role === "recruiter") {
+      router.push("/recruiter/dashboard");
+    } else {
+      router.push("/dashboard");
+    }
     router.refresh();
   }
 
@@ -140,6 +145,32 @@ export default function SignupPage() {
             <span className="relative bg-surface px-3 text-[11px] font-bold uppercase tracking-wider text-muted">
               Or sign up with email
             </span>
+          </div>
+
+          {/* Role Selector Tabs */}
+          <div className="mb-5 rounded-2xl border border-border/80 bg-soft/50 p-1.5 flex gap-1.5">
+            <button
+              type="button"
+              onClick={() => setRole("student")}
+              className={`flex-1 rounded-xl py-2 px-3 text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                role === "student"
+                  ? "bg-surface text-primary shadow-xs border border-border"
+                  : "text-muted hover:text-primary"
+              }`}
+            >
+              🎓 Student Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("recruiter")}
+              className={`flex-1 rounded-xl py-2 px-3 text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                role === "recruiter"
+                  ? "bg-surface text-primary shadow-xs border border-border"
+                  : "text-muted hover:text-primary"
+              }`}
+            >
+              👔 Recruiter Account
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -36,8 +36,8 @@ interface RecruiterShellProps {
 
 const recruiterNavItems = [
   { label: "Candidates & Talent", href: "/recruiter/dashboard", icon: Users },
-  { label: "College Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { label: "Portal Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "College Analytics", href: "/recruiter/analytics", icon: BarChart3 },
+  { label: "Portal Settings", href: "/recruiter/settings", icon: Settings },
 ];
 
 export default function RecruiterShell({
@@ -278,12 +278,10 @@ export default function RecruiterShell({
                 </button>
               )}
 
-              <Link
-                href="/dashboard"
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-2xl border border-border bg-base px-3.5 py-1.5 text-xs font-semibold text-muted transition hover:bg-soft hover:text-primary"
-              >
-                <span>Student View</span>
-              </Link>
+              <div className="hidden sm:inline-flex items-center gap-1.5 rounded-2xl border border-accent/20 bg-accent/10 px-3.5 py-1.5 text-xs font-semibold text-accent">
+                <Briefcase size={13} />
+                <span>Enterprise Portal</span>
+              </div>
             </div>
           </div>
         </header>

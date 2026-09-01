@@ -30,12 +30,28 @@ function ensureSeeded() {
 
   const defaultPasswordHash = bcrypt.hashSync("password123", 10);
 
-  // 1. Authorized Recruiter Account (Single authorized test recruiter)
+  // 1. Authorized Recruiter Accounts
   if (!globalWithUsers.__placementMentorUsers.has("recruiter@placementmentor.com")) {
     globalWithUsers.__placementMentorUsers.set("recruiter@placementmentor.com", {
       id: "recruiter_001",
       name: "Talent Partner",
       email: "recruiter@placementmentor.com",
+      password: defaultPasswordHash,
+      image: null,
+      role: "recruiter",
+      college: null,
+      branch: null,
+      batch: null,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+    });
+  }
+
+  if (!globalWithUsers.__placementMentorUsers.has("recruiter@mentor.com")) {
+    globalWithUsers.__placementMentorUsers.set("recruiter@mentor.com", {
+      id: "recruiter_002",
+      name: "Global Recruiter",
+      email: "recruiter@mentor.com",
       password: defaultPasswordHash,
       image: null,
       role: "recruiter",

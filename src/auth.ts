@@ -34,6 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        expectedRole: { label: "ExpectedRole", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -42,6 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
+        const expectedRole = credentials.expectedRole ? String(credentials.expectedRole).toLowerCase().trim() : undefined;
 
         const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
 
@@ -54,6 +56,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (user) {
               const isValidPassword = await bcrypt.compare(password, user.password);
               if (!isValidPassword) {
+                return null;
+              }
+
+              if (expectedRole && user.role !== expectedRole) {
                 return null;
               }
 
@@ -91,6 +97,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           (fallbackUser.password ? await bcrypt.compare(password, fallbackUser.password) : false);
 
         if (!isValidPassword) {
+          return null;
+        }
+
+        if (expectedRole && fallbackUser.role !== expectedRole) {
           return null;
         }
 

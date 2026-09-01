@@ -33,6 +33,8 @@ export async function POST(request: Request) {
     const normalizedName = String(nameValue).trim();
     const normalizedPassword = String(passwordValue);
 
+    const requestedRole = payload.role === "recruiter" ? "recruiter" : "student";
+
     const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
 
     if (shouldUsePrisma) {
@@ -52,6 +54,7 @@ export async function POST(request: Request) {
             name: normalizedName,
             email: normalizedEmail,
             password: hashedPassword,
+            role: requestedRole,
           },
         });
 
@@ -61,6 +64,7 @@ export async function POST(request: Request) {
             id: user.id,
             name: user.name,
             email: user.email,
+            role: user.role,
           },
         });
       } catch (error) {
@@ -72,6 +76,7 @@ export async function POST(request: Request) {
       name: normalizedName,
       email: normalizedEmail,
       password: normalizedPassword,
+      role: requestedRole,
     });
 
     return NextResponse.json({
@@ -80,6 +85,7 @@ export async function POST(request: Request) {
         id: fallbackUser.id,
         name: fallbackUser.name,
         email: fallbackUser.email,
+        role: fallbackUser.role,
       },
     });
   } catch (error) {
