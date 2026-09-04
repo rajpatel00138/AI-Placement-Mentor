@@ -1,12 +1,47 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { recordMockInterview } from "@/lib/activity/service";
+import { recordMockInterview, getUserInterviewData } from "@/lib/activity/service";
+
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const role = (session.user as any).role;
+    if (role === "recruiter") {
+      return NextResponse.json({
+        success: true,
+        data: {
+          completedCount: 0,
+          bestScore: 0,
+          streakDays: 0,
+          readinessScore: 0,
+          lastUpdated: null,
+          interviews: [],
+        },
+      });
+    }
+
+    const data = await getUserInterviewData(session.user.id);
+    return NextResponse.json({ success: true, data });
+  } catch (error: any) {
+    console.error("Failed to fetch interview data:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
 
 export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const role = (session.user as any).role;
+    if (role === "recruiter") {
+      return NextResponse.json({ error: "Forbidden for recruiter" }, { status: 403 });
     }
 
     const body = await req.json();

@@ -617,3 +617,178 @@ export async function getUserPerformance(userId: string): Promise<UserPerformanc
     recentActivities: formattedActivities,
   };
 }
+
+export interface FormattedInterviewRecord {
+  id: string;
+  title: string;
+  category: string;
+  difficulty: string;
+  score: number;
+  durationMin: number;
+  feedback?: string | null;
+  createdAt: string;
+  dateFormatted: string;
+}
+
+export interface UserInterviewData {
+  completedCount: number;
+  bestScore: number;
+  streakDays: number;
+  readinessScore: number;
+  lastUpdated: string | null;
+  interviews: FormattedInterviewRecord[];
+}
+
+export function calculateStreak(dates: (Date | string)[]): number {
+  if (!dates || dates.length === 0) return 0;
+
+  const dateSet = new Set<string>();
+  dates.forEach((d) => {
+    const dateObj = new Date(d);
+    if (!isNaN(dateObj.getTime())) {
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const dd = String(dateObj.getDate()).padStart(2, "0");
+      dateSet.add(`${yyyy}-${mm}-${dd}`);
+    }
+  });
+
+  const sortedDates = Array.from(dateSet).sort().reverse();
+  if (sortedDates.length === 0) return 0;
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+
+  const latestDateStr = sortedDates[0];
+  if (latestDateStr !== todayStr && latestDateStr !== yesterdayStr) {
+    return 0;
+  }
+
+  let streak = 0;
+  let checkDate = new Date(latestDateStr === todayStr ? today : yesterday);
+
+  for (let i = 0; i < 365; i++) {
+    const expectedStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, "0")}-${String(checkDate.getDate()).padStart(2, "0")}`;
+    if (dateSet.has(expectedStr)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+export function formatInterviewDate(dateInput: Date | string): string {
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return "Recently";
+
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  const targetStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (todayStr === targetStr) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+export function formatRelativeTime(date: Date | string | null): string {
+  if (!date) return "No sessions yet";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "No sessions yet";
+
+  const diffMs = Date.now() - d.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 2) return "Updated just now";
+  if (diffMins < 60) return `Updated ${diffMins}m ago`;
+  if (diffHours < 24) return `Updated ${diffHours}h ago`;
+  if (diffDays === 1) return "Updated yesterday";
+  if (diffDays < 7) return `Updated ${diffDays}d ago`;
+  return `Updated on ${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+}
+
+// 9. Get User's Scoped Interview Data
+export async function getUserInterviewData(userId: string): Promise<UserInterviewData> {
+  const userKeys = await resolveUserKeys(userId);
+  let records: Array<{
+    id: string;
+    userId: string;
+    title: string;
+    category: string;
+    difficulty: string;
+    score: number;
+    durationMin: number;
+    feedback?: string | null;
+    createdAt: Date;
+  }> = [];
+
+  if (shouldUsePrisma()) {
+    try {
+      const dbRecords = await prisma.interviewRecord.findMany({
+        where: { userId: { in: userKeys } },
+        orderBy: { createdAt: "desc" },
+      });
+      records = dbRecords;
+    } catch (err) {
+      console.warn("Prisma getUserInterviewData fallback:", err);
+    }
+  }
+
+  // Merge in-memory records
+  const store = getMemoryStore();
+  for (const k of userKeys) {
+    const memRecords = store.interviewRecords.get(k) || [];
+    for (const r of memRecords) {
+      if (!records.some((existing) => existing.id === r.id)) {
+        records.push(r);
+      }
+    }
+  }
+
+  // Sort descending by creation date
+  records.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const completedCount = records.length;
+  const bestScore = completedCount > 0 ? Math.max(...records.map((r) => r.score)) : 0;
+  const streakDays = calculateStreak(records.map((r) => r.createdAt));
+  const lastUpdated = records.length > 0 ? new Date(records[0].createdAt).toISOString() : null;
+
+  const performance = await getUserPerformance(userId);
+  const readinessScore = performance.readinessScore;
+
+  const formattedInterviews: FormattedInterviewRecord[] = records.map((r) => ({
+    id: r.id,
+    title: r.title,
+    category: r.category,
+    difficulty: r.difficulty,
+    score: r.score,
+    durationMin: r.durationMin,
+    feedback: r.feedback ?? null,
+    createdAt: new Date(r.createdAt).toISOString(),
+    dateFormatted: formatInterviewDate(r.createdAt),
+  }));
+
+  return {
+    completedCount,
+    bestScore,
+    streakDays,
+    readinessScore,
+    lastUpdated,
+    interviews: formattedInterviews,
+  };
+}
+

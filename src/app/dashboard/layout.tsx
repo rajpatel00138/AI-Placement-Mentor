@@ -14,6 +14,11 @@ export default async function DashboardLayout({
     redirect("/auth/login");
   }
 
+  const userRole = (session.user as any).role;
+  if (userRole === "recruiter") {
+    redirect("/recruiter/dashboard");
+  }
+
   return (
     <DashboardShell user={session.user} logoutAction={logoutUser}>
       {children}

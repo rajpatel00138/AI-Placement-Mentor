@@ -74,6 +74,46 @@ export default function ProgressSidebar() {
       }
 
       setEvaluation(data.evaluation);
+
+      // Record mock interview in user's profile/DB
+      try {
+        const categoryMap: Record<string, string> = {
+          hr: "HR",
+          technical: "Technical",
+          dsa: "DSA",
+          pseudocode: "Pseudocode",
+          dbms: "DBMS",
+          os: "Operating Systems",
+          cn: "Computer Networks",
+          "system-design": "System Design",
+          aptitude: "Aptitude",
+        };
+        const categoryTitle = categoryMap[state.interviewType] || "Technical";
+        const difficultyCap =
+          state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1);
+        const overallScore = Number(data.evaluation?.overallScore ?? 0);
+
+        await fetch("/api/user/interviews", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: `${state.company ? `${state.company} ` : ""}${categoryTitle} Interview`,
+            category: categoryTitle,
+            difficulty: difficultyCap,
+            score: overallScore,
+            durationMin: state.duration || 30,
+            feedback:
+              data.evaluation?.overalloverallFeedback ||
+              data.evaluation?.hiringRecommendation?.reason ||
+              "Mock interview completed.",
+          }),
+        });
+
+        window.dispatchEvent(new Event("activityUpdated"));
+      } catch (saveErr) {
+        console.warn("Failed to persist interview record:", saveErr);
+      }
+
       finishInterview();
       router.push("/dashboard/interview/report");
     } catch (error) {

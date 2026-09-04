@@ -3,8 +3,27 @@
 import { useRouter } from "next/navigation";
 import { ArrowRight, Brain } from "lucide-react";
 
-export default function HeroBanner() {
+interface HeroBannerProps {
+  readinessScore?: number;
+  bestScore?: number;
+  completedCount?: number;
+  isLoading?: boolean;
+}
+
+export default function HeroBanner({
+  readinessScore = 0,
+  bestScore = 0,
+  completedCount = 0,
+  isLoading = false,
+}: HeroBannerProps) {
   const router = useRouter();
+
+  const handleScrollToRecent = () => {
+    const el = document.getElementById("recent-interviews");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-8 shadow-sm backdrop-blur-xl">
@@ -39,7 +58,7 @@ export default function HeroBanner() {
             </button>
 
             <button
-              onClick={() => router.push("/dashboard/interview/history")}
+              onClick={handleScrollToRecent}
               className="rounded-2xl border border-border bg-surface px-6 py-3 font-semibold text-slate-900 dark:text-slate-100 transition hover:bg-soft cursor-pointer"
             >
               Interview History
@@ -49,19 +68,25 @@ export default function HeroBanner() {
 
         {/* Right Summary Metrics */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs">
-            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-medium">Readiness</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">87%</h2>
+          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs transition hover:border-accent/50">
+            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-medium">Readiness</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
+              {isLoading ? "--" : `${readinessScore}%`}
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs">
-            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-medium">Best Score</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-accent">92</h2>
+          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs transition hover:border-accent/50">
+            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-medium">Best Score</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-accent">
+              {isLoading ? "--" : bestScore > 0 ? `${bestScore}%` : "0"}
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs">
-            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-300 font-medium">Completed</p>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">12</h2>
+          <div className="rounded-2xl border border-border bg-base p-4 text-center shadow-xs transition hover:border-accent/50">
+            <p className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-medium">Completed</p>
+            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
+              {isLoading ? "--" : completedCount}
+            </h2>
           </div>
         </div>
       </div>
