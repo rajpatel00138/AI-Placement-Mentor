@@ -16,6 +16,7 @@ interface ResumeAnalysisProps {
     strengths: string[];
     weaknesses: string[];
     suggestions: string[];
+    roadmap?: string[];
   };
 }
 
@@ -72,6 +73,7 @@ export default function ResumeAnalysis({
 
       {/* Roadmap */}
       <RoadmapCard
+        roadmap={analysis.roadmap}
         suggestions={analysis.suggestions}
       />
 

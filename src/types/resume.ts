@@ -6,6 +6,7 @@ export interface ResumeAnalysis {
   strengths: string[];
   weaknesses: string[];
   suggestions: string[];
+  roadmap: string[];
 }
 
 export interface ResumeFile {

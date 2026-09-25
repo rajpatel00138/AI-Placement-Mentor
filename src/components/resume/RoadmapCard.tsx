@@ -4,12 +4,15 @@ import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 
 interface RoadmapCardProps {
-  suggestions: string[];
+  roadmap?: string[];
+  suggestions?: string[];
 }
 
 export default function RoadmapCard({
-  suggestions,
+  roadmap,
+  suggestions = [],
 }: RoadmapCardProps) {
+  const steps = roadmap && roadmap.length > 0 ? roadmap : suggestions;
   return (
     <motion.div
       whileHover={{ y: -5 }}
@@ -37,8 +40,8 @@ export default function RoadmapCard({
         <div className="absolute left-5 top-0 h-full w-0.5 rounded-full bg-border" />
 
         <div className="space-y-6">
-          {suggestions.length > 0 ? (
-            suggestions.map((item, index) => (
+          {steps.length > 0 ? (
+            steps.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{

@@ -62,6 +62,7 @@ model User {
   interviewRecords  InterviewRecord[]
   resumeRecords     ResumeRecord[]
   readinessSnapshots ReadinessSnapshot[]
+  companyQuestionProgress StudentCompanyQuestionProgress[]
 
   lastLoginAt DateTime?
   createdAt   DateTime @default(now())
@@ -175,4 +176,49 @@ model ReadinessSnapshot {
   date           DateTime @default(now())
 
   @@index([userId, date])
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionStatus {
+  SOLVED
+  BOOKMARKED
+  UNSOLVED
+}
+
+model CompanyQuestion {
+  id             String                          @id @default(cuid())
+  companyName    String
+  timeframe      String
+  leetcodeId     Int?
+  title          String
+  difficulty     Difficulty
+  acceptanceRate Float?
+  frequency      Float?
+  problemUrl     String
+  progress       StudentCompanyQuestionProgress[]
+  createdAt      DateTime                        @default(now())
+  updatedAt      DateTime                        @updatedAt
+
+  @@index([companyName, timeframe])
+  @@index([companyName, difficulty])
+}
+
+model StudentCompanyQuestionProgress {
+  id         String          @id @default(cuid())
+  studentId  String
+  student    User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  questionId String
+  question   CompanyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  status     QuestionStatus  @default(UNSOLVED)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([studentId, questionId])
+  @@index([studentId])
+  @@index([questionId])
 }
