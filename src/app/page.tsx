@@ -19,6 +19,7 @@ import {
   TrendingUp,
   ChevronRight,
   Target,
+  FileText,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -414,12 +415,12 @@ export default function LandingPage() {
                 Engineered for Placement Excellence
               </h2>
               <p className="text-sm text-muted">
-                Everything you need to benchmark skills, optimize profiles, and secure tier-1 offers.
+                Everything you need to benchmark skills, sharpen your resume, and secure tier-1 offers.
               </p>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {/* Feature 1 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Feature 1: Placement Roadmap */}
               <div className="group rounded-[26px] border border-border bg-surface p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-accent/30 bg-accent/15 text-accent mb-5">
                   <Compass className="h-6 w-6" />
@@ -428,14 +429,14 @@ export default function LandingPage() {
                   Placement Roadmap
                 </h3>
                 <p className="mt-2 text-sm text-muted leading-relaxed">
-                  Structure your journey with personalized milestones, skill gap analysis, and tailored company preparation tracks.
+                  Structure your journey with personalized milestones, skill gap analysis, and a clear week-by-week path to your target role.
                 </p>
                 <Link href="/dashboard/roadmap" className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover transition">
                   Explore Roadmap <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
 
-              {/* Feature 2 */}
+              {/* Feature 2: AI Mock Interviews */}
               <div className="group rounded-[26px] border border-border bg-surface p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-accent-secondary/30 bg-accent-secondary/15 text-accent-secondary mb-5">
                   <Mic className="h-6 w-6" />
@@ -444,26 +445,42 @@ export default function LandingPage() {
                   AI Mock Interviews
                 </h3>
                 <p className="mt-2 text-sm text-muted leading-relaxed">
-                  Practice behavioral and system architecture questions with instant feedback on confidence, clarity, and keyword coverage.
+                  Practice behavioral and technical questions with instant feedback on confidence, clarity, and keyword coverage.
                 </p>
                 <Link href="/dashboard/interview" className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover transition">
                   Start Practice <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
 
-              {/* Feature 3 */}
+              {/* Feature 3: Resume Analysis */}
               <div className="group rounded-[26px] border border-border bg-surface p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-success/30 bg-success/15 text-success mb-5">
-                  <BarChart3 className="h-6 w-6" />
+                  <FileText className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-bold text-primary group-hover:text-accent transition">
-                  Recruiter Analytics
+                  Resume Analysis
                 </h3>
                 <p className="mt-2 text-sm text-muted leading-relaxed">
-                  Transparent percentile ranking, logistic placement probability, and deep domain metrics across five core pillars.
+                  Get an ATS-style score, section-by-section feedback, and keyword gap analysis so your resume gets shortlisted.
                 </p>
-                <Link href="/dashboard/analytics" className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover transition">
-                  View Analytics <ChevronRight className="h-3.5 w-3.5" />
+                <Link href="/dashboard/resume" className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover transition">
+                  Analyze Resume <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              {/* Feature 4: Company-Wise Preparation */}
+              <div className="group rounded-[26px] border border-border bg-surface p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-warning/30 bg-warning/15 text-warning mb-5">
+                  <Building2 className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-bold text-primary group-hover:text-accent transition">
+                  Company-Wise Preparation
+                </h3>
+                <p className="mt-2 text-sm text-muted leading-relaxed">
+                  Practice real interview questions asked by top companies, filtered by timeframe, with progress tracking for every question.
+                </p>
+                <Link href="/student/company-prep" className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover transition">
+                  Start Preparing <ChevronRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </div>
