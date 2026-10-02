@@ -1,10 +1,18 @@
-const API_URL = "http://127.0.0.1:8000";
+const getApiUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  return "";
+};
 
 export async function analyzeResume(file: File) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await fetch(`${API_URL}/analyze`, {
+  const baseUrl = getApiUrl();
+  const endpoint = baseUrl ? `${baseUrl}/api/py/analyze` : "/api/py/analyze";
+
+  const response = await fetch(endpoint, {
     method: "POST",
     body: formData,
   });
