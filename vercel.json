@@ -4,11 +4,11 @@
   "buildCommand": "prisma generate && next build",
   "installCommand": "npm install",
   "functions": {
-    "api/**/*.py": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
+  "api/index.py": {
+    "maxDuration": 60,
+    "memory": 1024
+  }
+},
   "rewrites": [
     {
       "source": "/api/py/:path*",
