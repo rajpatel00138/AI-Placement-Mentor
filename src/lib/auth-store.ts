@@ -28,60 +28,75 @@ function ensureSeeded() {
     globalWithUsers.__placementMentorUsers = new Map<string, StoredUser>();
   }
 
-  const defaultPasswordHash = bcrypt.hashSync("password123", 10);
+  const defaultPasswordHash = bcrypt.hashSync("Password@123", 10);
 
   // 1. Authorized Recruiter Accounts
-  if (!globalWithUsers.__placementMentorUsers.has("recruiter@placementmentor.com")) {
-    globalWithUsers.__placementMentorUsers.set("recruiter@placementmentor.com", {
-      id: "recruiter_001",
-      name: "Talent Partner",
-      email: "recruiter@placementmentor.com",
-      password: defaultPasswordHash,
-      image: null,
-      role: "recruiter",
-      college: null,
-      branch: null,
-      batch: null,
-      lastLoginAt: new Date(),
-      createdAt: new Date(),
-    });
-  }
+  globalWithUsers.__placementMentorUsers.set("recruiter@placementmentor.com", {
+    id: "recruiter_001",
+    name: "Talent Partner",
+    email: "recruiter@placementmentor.com",
+    password: defaultPasswordHash,
+    image: null,
+    role: "recruiter",
+    college: "Apex Institute of Technology",
+    branch: null,
+    batch: null,
+    targetRole: "Talent Acquisition",
+    targetCompany: "Top Tech",
+    lastLoginAt: new Date(),
+    createdAt: new Date(),
+  });
 
-  if (!globalWithUsers.__placementMentorUsers.has("recruiter@mentor.com")) {
-    globalWithUsers.__placementMentorUsers.set("recruiter@mentor.com", {
-      id: "recruiter_002",
-      name: "Global Recruiter",
-      email: "recruiter@mentor.com",
-      password: defaultPasswordHash,
-      image: null,
-      role: "recruiter",
-      college: null,
-      branch: null,
-      batch: null,
-      lastLoginAt: new Date(),
-      createdAt: new Date(),
-    });
-  }
+  globalWithUsers.__placementMentorUsers.set("recruiter@mentor.com", {
+    id: "recruiter_002",
+    name: "Global Recruiter",
+    email: "recruiter@mentor.com",
+    password: defaultPasswordHash,
+    image: null,
+    role: "recruiter",
+    college: null,
+    branch: null,
+    batch: null,
+    targetRole: "Talent Acquisition",
+    targetCompany: "Top Tech",
+    lastLoginAt: new Date(),
+    createdAt: new Date(),
+  });
 
-  // 2. Demo Student Account (Starts clean)
-  if (!globalWithUsers.__placementMentorUsers.has("demo@placementmentor.com")) {
-    globalWithUsers.__placementMentorUsers.set("demo@placementmentor.com", {
-      id: "demo_001",
-      name: "Demo Student",
-      email: "demo@placementmentor.com",
-      password: defaultPasswordHash,
-      image: null,
-      role: "student",
-      college: "Apex Institute of Technology",
-      branch: "CSE",
-      batch: "2025-A",
-      graduationYear: 2025,
-      targetRole: "Full Stack Engineer",
-      targetCompany: "Google",
-      lastLoginAt: new Date(),
-      createdAt: new Date(),
-    });
-  }
+  // 2. Demo Student Accounts
+  globalWithUsers.__placementMentorUsers.set("demo@placementmentor.com", {
+    id: "demo_001",
+    name: "Demo Student",
+    email: "demo@placementmentor.com",
+    password: defaultPasswordHash,
+    image: null,
+    role: "student",
+    college: "Apex Institute of Technology",
+    branch: "CSE",
+    batch: "2025-A",
+    graduationYear: 2025,
+    targetRole: "Full Stack Engineer",
+    targetCompany: "Google",
+    lastLoginAt: new Date(),
+    createdAt: new Date(),
+  });
+
+  globalWithUsers.__placementMentorUsers.set("student@placementmentor.com", {
+    id: "demo_002",
+    name: "Placement Student",
+    email: "student@placementmentor.com",
+    password: defaultPasswordHash,
+    image: null,
+    role: "student",
+    college: "Apex Institute of Technology",
+    branch: "CSE",
+    batch: "2025-A",
+    graduationYear: 2025,
+    targetRole: "Software Engineer",
+    targetCompany: "Microsoft",
+    lastLoginAt: new Date(),
+    createdAt: new Date(),
+  });
 
   // 3. Real / Google Student Account (Monster)
   if (!globalWithUsers.__placementMentorUsers.has("rp286895@gmail.com")) {
