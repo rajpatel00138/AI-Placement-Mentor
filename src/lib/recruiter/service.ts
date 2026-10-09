@@ -1,5 +1,5 @@
 import { getStudentAnalytics } from "@/lib/analytics/service";
-import { getUserPerformance } from "@/lib/activity/service";
+import { getUserPerformance, getUserInterviewData } from "@/lib/activity/service";
 import { StudentDeepDiveProfile } from "./types";
 
 /**
@@ -15,7 +15,10 @@ export async function getStudentDeepDiveProfile(
     return null;
   }
 
-  const perf = await getUserPerformance(student.id);
+  const [perf, userInterviewData] = await Promise.all([
+    getUserPerformance(student.id),
+    getUserInterviewData(student.id),
+  ]);
 
   const dsaScore = perf.dsaScore;
   const resumeScore = perf.resumeScore;
@@ -25,42 +28,32 @@ export async function getStudentDeepDiveProfile(
   const readinessScore = perf.readinessScore;
 
   // 1. Resume Module Diagnostics
-  const resumeFeedbackSummary =
-    resumeScore >= 80
-      ? (perf.latestResume?.summary || "Strong ATS score with relevant keywords aligned with target software engineering roles.")
-      : resumeScore >= 60
-      ? (perf.latestResume?.summary || "Moderate ATS score. Actionable technical keywords present, but project impact metrics can be enhanced.")
-      : resumeScore > 0
-      ? (perf.latestResume?.summary || "Needs improvement. Missing core industry skill keywords and clear outcome metrics.")
-      : "No resume has been uploaded yet for this candidate.";
+  const hasResume = Boolean(perf.latestResume);
+  const resumeFeedbackSummary = hasResume
+    ? (resumeScore >= 80
+        ? (perf.latestResume?.summary || "Strong ATS score with relevant keywords aligned with target software engineering roles.")
+        : resumeScore >= 60
+        ? (perf.latestResume?.summary || "Moderate ATS score. Actionable technical keywords present, but project impact metrics can be enhanced.")
+        : (perf.latestResume?.summary || "Needs improvement. Missing core industry skill keywords and clear outcome metrics."))
+    : "No resume has been uploaded yet for this candidate.";
 
-  const resumeSkills =
-    perf.latestResume?.skills && perf.latestResume.skills.length > 0
-      ? perf.latestResume.skills
-      : [
-          "Data Structures & Algorithms",
-          "Full-Stack Web Development",
-          "TypeScript & React",
-          "Node.js & Express",
-          "PostgreSQL & SQL",
-          "Git & Version Control",
-          "RESTful API Design",
-        ];
+  const resumeSkills = hasResume && perf.latestResume?.skills && perf.latestResume.skills.length > 0
+    ? perf.latestResume.skills
+    : [];
 
-  const resumeGaps =
-    perf.latestResume?.skillGaps && perf.latestResume.skillGaps.length > 0
-      ? perf.latestResume.skillGaps
-      : resumeScore >= 80
-      ? ["Distributed Caching (Redis)", "Microservices Design Patterns"]
-      : resumeScore >= 60
-      ? ["System Architecture Documentation", "Cloud Deployment (AWS/Docker)", "Unit Testing Frameworks"]
-      : ["Core OOP Concepts", "Database Normalization & Query Tuning", "API Authentication Protocols"];
+  const resumeGaps = hasResume && perf.latestResume?.skillGaps && perf.latestResume.skillGaps.length > 0
+    ? perf.latestResume.skillGaps
+    : [];
 
-  const resumeRecommendations = [
-    "Quantify project accomplishments using Google's X-Y-Z formula (Accomplished [X], measured by [Y], by doing [Z]).",
-    "Add dedicated sections for open-source contributions and technical certifications.",
-    "Ensure resume bullet points highlight leadership and problem-solving impact.",
-  ];
+  const resumeRecommendations = hasResume
+    ? [
+        "Quantify project accomplishments using Google's X-Y-Z formula (Accomplished [X], measured by [Y], by doing [Z]).",
+        "Add dedicated sections for open-source contributions and technical certifications.",
+        "Ensure resume bullet points highlight leadership and problem-solving impact.",
+      ]
+    : [
+        "Candidate has not yet uploaded a resume for automated ATS evaluation.",
+      ];
 
   // 2. DSA Tracker Diagnostics
   const totalDsaProblems = 180;
@@ -71,7 +64,7 @@ export async function getStudentDeepDiveProfile(
 
   // 3. Interview Diagnostics
   const completedMocks = perf.mockInterviewsCount;
-  const bestInterviewScore = interviewScore > 0 ? Math.min(100, interviewScore + 4) : 0;
+  const bestInterviewScore = userInterviewData.bestScore;
 
   // 4. Roadmap Diagnostics
   const roadmapCompletion = perf.roadmapProgress;

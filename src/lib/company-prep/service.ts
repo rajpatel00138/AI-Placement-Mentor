@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 
 export interface CompanyQuestionItem {
   id: string;
@@ -45,30 +45,8 @@ export interface CompanyStats {
 let cachedQuestions: CompanyQuestionItem[] | null = null;
 let cachedCompaniesMap: Map<string, CompanyMeta> | null = null;
 
-const PROGRESS_STORE_PATH = path.join(process.cwd(), "data", "company_progress_store.json");
+const fallbackProgressStore = new Map<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED">();
 const QUESTIONS_STORE_PATH = path.join(process.cwd(), "data", "company_prep_store.json");
-
-function loadProgressStore(): Record<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED"> {
-  try {
-    if (fs.existsSync(PROGRESS_STORE_PATH)) {
-      const raw = fs.readFileSync(PROGRESS_STORE_PATH, "utf-8");
-      return JSON.parse(raw);
-    }
-  } catch (err) {
-    console.warn("Could not read progress store:", err);
-  }
-  return {};
-}
-
-function saveProgressStore(store: Record<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED">) {
-  try {
-    const dir = path.dirname(PROGRESS_STORE_PATH);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(PROGRESS_STORE_PATH, JSON.stringify(store, null, 2), "utf-8");
-  } catch (err) {
-    console.warn("Could not save progress store:", err);
-  }
-}
 
 function loadQuestionsFromDisk(): CompanyQuestionItem[] {
   if (cachedQuestions && cachedQuestions.length > 0) {
@@ -105,9 +83,7 @@ function loadQuestionsFromDisk(): CompanyQuestionItem[] {
 }
 
 export async function getCompaniesList(): Promise<CompanyMeta[]> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
-
-  if (shouldUsePrisma) {
+  if (shouldUsePrisma()) {
     try {
       if ((prisma as any).companyQuestion) {
         const dbCompanies = await (prisma as any).companyQuestion.groupBy({
@@ -215,8 +191,28 @@ export async function getCompanyQuestions(params: GetQuestionsParams) {
   const allQuestions = loadQuestionsFromDisk();
   const normalizedCompany = company.toLowerCase().trim().replace(/[-_]+/g, " ");
 
-  // Load student progress store
-  const progressMap = loadProgressStore();
+  // Load student progress store from Prisma
+  const progressMap: Record<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED"> = {};
+
+  if (shouldUsePrisma() && studentId && studentId !== "guest") {
+    try {
+      const records = await prisma.studentCompanyQuestionProgress.findMany({
+        where: { studentId },
+      });
+      for (const r of records) {
+        progressMap[`${studentId}:${r.questionId}`] = r.status as any;
+      }
+    } catch (err) {
+      console.warn("Failed to load studentCompanyQuestionProgress from Prisma:", err);
+    }
+  }
+
+  // Merge in-memory fallback
+  for (const [key, val] of fallbackProgressStore.entries()) {
+    if (key.startsWith(`${studentId}:`) && !progressMap[key]) {
+      progressMap[key] = val;
+    }
+  }
 
   // Find all questions for this company
   let companyQuestions = allQuestions.filter((q) => {
@@ -379,33 +375,49 @@ export async function setQuestionStatus(
   questionId: string,
   status: "SOLVED" | "BOOKMARKED" | "UNSOLVED"
 ) {
-  const progressMap = loadProgressStore();
   const key = `${studentId}:${questionId}`;
-  progressMap[key] = status;
-  saveProgressStore(progressMap);
+  fallbackProgressStore.set(key, status);
 
-  // Also try updating Prisma if connected
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
-  if (shouldUsePrisma) {
+  if (shouldUsePrisma() && studentId && studentId !== "guest") {
     try {
-      if ((prisma as any).studentCompanyQuestionProgress) {
-        await (prisma as any).studentCompanyQuestionProgress.upsert({
-          where: {
-            studentId_questionId: {
-              studentId,
-              questionId,
-            },
-          },
-          update: { status },
+      // Ensure companyQuestion exists to satisfy foreign key relation
+      const allQuestions = loadQuestionsFromDisk();
+      const qMeta = allQuestions.find((q) => q.id === questionId);
+
+      if (qMeta) {
+        await (prisma as any).companyQuestion.upsert({
+          where: { id: questionId },
+          update: {},
           create: {
-            studentId,
-            questionId,
-            status,
+            id: questionId,
+            companyName: qMeta.companyName,
+            timeframe: qMeta.timeframe,
+            leetcodeId: qMeta.leetcodeId,
+            title: qMeta.title,
+            difficulty: qMeta.difficulty || "MEDIUM",
+            acceptanceRate: qMeta.acceptanceRate,
+            frequency: qMeta.frequency,
+            problemUrl: qMeta.problemUrl,
           },
         });
       }
+
+      await (prisma as any).studentCompanyQuestionProgress.upsert({
+        where: {
+          studentId_questionId: {
+            studentId,
+            questionId,
+          },
+        },
+        update: { status },
+        create: {
+          studentId,
+          questionId,
+          status,
+        },
+      });
     } catch (err) {
-      console.warn("Prisma progress upsert failed, stored in fallback store:", err);
+      console.warn("Prisma studentCompanyQuestionProgress upsert failed:", err);
     }
   }
 

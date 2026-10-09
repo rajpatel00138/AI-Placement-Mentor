@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { findUserByEmailFallback, findUserByIdFallback } from "@/lib/auth-store";
 
 export interface UserPerformanceMetrics {
@@ -67,7 +67,6 @@ function getMemoryStore(): MemoryStore {
   return globalMemoryStore.__placementMentorActivityStore;
 }
 
-const shouldUsePrisma = () => process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
 
 // 1. Log Activity with Deduplication
 export async function logActivity(

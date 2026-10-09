@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { ai, GEMINI_MODEL } from "./client";
 import { buildMentorSystemPrompt, StudentMentorContext } from "./mentor-prompt";
 import { getStudentAnalytics } from "@/lib/analytics/service";
@@ -42,9 +42,9 @@ export async function getOrCreateChatSession(
   sessionId?: string,
   initialTitle: string = "New Mentoring Session"
 ): Promise<ChatSessionRecord> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
 
-  if (shouldUsePrisma && sessionId) {
+  if (usePrisma && sessionId) {
     try {
       const session = await prisma.chatSession.findFirst({
         where: { id: sessionId, userId },
@@ -63,7 +63,7 @@ export async function getOrCreateChatSession(
     }
   }
 
-  if (shouldUsePrisma && !sessionId) {
+  if (usePrisma && !sessionId) {
     try {
       const session = await prisma.chatSession.create({
         data: {
@@ -109,9 +109,8 @@ export async function getOrCreateChatSession(
  * List all sessions for a user.
  */
 export async function listUserChatSessions(userId: string): Promise<ChatSessionRecord[]> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
-
-  if (shouldUsePrisma) {
+  const usePrisma = shouldUsePrisma();
+  if (usePrisma) {
     try {
       const sessions = await prisma.chatSession.findMany({
         where: { userId },
@@ -145,9 +144,8 @@ export async function listUserChatSessions(userId: string): Promise<ChatSessionR
  * Get messages for a session.
  */
 export async function getSessionMessages(sessionId: string, userId: string): Promise<ChatMessageRecord[] | null> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
-
-  if (shouldUsePrisma) {
+  const usePrisma = shouldUsePrisma();
+  if (usePrisma) {
     try {
       const session = await prisma.chatSession.findFirst({
         where: { id: sessionId, userId },
@@ -183,9 +181,8 @@ export async function getSessionMessages(sessionId: string, userId: string): Pro
  * Delete a session.
  */
 export async function deleteChatSession(sessionId: string, userId: string): Promise<boolean> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
-
-  if (shouldUsePrisma) {
+  const usePrisma = shouldUsePrisma();
+  if (usePrisma) {
     try {
       const session = await prisma.chatSession.findFirst({
         where: { id: sessionId, userId },
@@ -310,8 +307,8 @@ export async function sendMentorMessage(
     createdAt: new Date(Date.now() + 100).toISOString(),
   };
 
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
-  if (shouldUsePrisma) {
+  const usePrisma = shouldUsePrisma();
+  if (usePrisma) {
     try {
       await prisma.chatMessage.createMany({
         data: [
@@ -449,8 +446,8 @@ export async function persistMentorTurn(
     createdAt: new Date(Date.now() + 100).toISOString(),
   };
 
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
-  if (shouldUsePrisma) {
+  const usePrisma = shouldUsePrisma();
+  if (usePrisma) {
     try {
       await prisma.chatMessage.createMany({
         data: [

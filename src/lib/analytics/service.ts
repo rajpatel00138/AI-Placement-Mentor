@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { getAllRegisteredStudentsFallback, findUserByIdFallback } from "@/lib/auth-store";
 import { getUserPerformance } from "@/lib/activity/service";
 import {
@@ -7,8 +7,6 @@ import {
   StudentAnalyticsRecord,
 } from "./types";
 import { calculateCollegeStatistics, deriveActivityStatus, getStudentStrengthsAndWeaknesses } from "./calculations";
-
-const shouldUsePrisma = () => process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
 
 /**
  * Normalizes a real database/registered user into a StudentAnalyticsRecord with live dynamic performance metrics.

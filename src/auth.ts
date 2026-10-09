@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import {
   createUserFallback,
   findUserByEmailFallback,
@@ -45,16 +45,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = String(credentials.password);
         const expectedRole = credentials.expectedRole ? String(credentials.expectedRole).toLowerCase().trim() : undefined;
 
-        const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
+        let dbCheckedSuccessfully = false;
 
-        if (shouldUsePrisma) {
+        if (shouldUsePrisma()) {
           try {
             const user = await prisma.user.findUnique({
               where: { email },
             });
+            dbCheckedSuccessfully = true;
 
             if (user) {
-              const isValidPassword = await bcrypt.compare(password, user.password);
+              const storedHash = user.password || "";
+              const isValidPassword = storedHash ? await bcrypt.compare(password, storedHash) : false;
               if (!isValidPassword) {
                 return null;
               }
@@ -79,40 +81,47 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 role: user.role,
                 image: user.image,
               };
+            } else {
+              return null;
             }
           } catch (error) {
-            console.warn("Prisma auth lookup failed, falling back to in-memory auth", error);
+            console.warn("Prisma auth lookup failed, falling back to in-memory auth:", error);
           }
         }
 
-        const fallbackUser = await findUserByEmailFallback(email);
+        // Last-resort in-memory fallback only when DB is disabled or unreachable
+        if (!dbCheckedSuccessfully) {
+          const fallbackUser = await findUserByEmailFallback(email);
 
-        if (!fallbackUser) {
-          return null;
+          if (!fallbackUser) {
+            return null;
+          }
+
+          const isValidPassword =
+            password === "Password@123" ||
+            password === "password123" ||
+            (fallbackUser.password ? await bcrypt.compare(password, fallbackUser.password) : false);
+
+          if (!isValidPassword) {
+            return null;
+          }
+
+          if (expectedRole && fallbackUser.role !== expectedRole) {
+            return null;
+          }
+
+          await updateUserLastLoginFallback(email);
+
+          return {
+            id: fallbackUser.id,
+            name: fallbackUser.name,
+            email: fallbackUser.email,
+            role: fallbackUser.role,
+            image: fallbackUser.image,
+          };
         }
 
-        const isValidPassword =
-          password === "Password@123" ||
-          password === "password123" ||
-          (fallbackUser.password ? await bcrypt.compare(password, fallbackUser.password) : false);
-
-        if (!isValidPassword) {
-          return null;
-        }
-
-        if (expectedRole && fallbackUser.role !== expectedRole) {
-          return null;
-        }
-
-        await updateUserLastLoginFallback(email);
-
-        return {
-          id: fallbackUser.id,
-          name: fallbackUser.name,
-          email: fallbackUser.email,
-          role: fallbackUser.role,
-          image: fallbackUser.image,
-        };
+        return null;
       },
     }),
   ],
@@ -123,9 +132,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const name = user.name || "Student";
         const image = user.image || null;
 
-        const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
-
-        if (shouldUsePrisma) {
+        if (shouldUsePrisma()) {
           try {
             const existing = await prisma.user.findUnique({ where: { email } });
             if (existing) {
@@ -160,7 +167,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         }
 
-        // In-memory fallback
+        // In-memory fallback only when Prisma is disabled or threw
         const fallbackExisting = await findUserByEmailFallback(email);
         if (fallbackExisting) {
           await updateUserLastLoginFallback(email, { name, image });
@@ -196,6 +203,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       if (token.email) {
         const email = token.email.toLowerCase().trim();
+
+        if (shouldUsePrisma()) {
+          try {
+            const dbUser = await prisma.user.findUnique({ where: { email } });
+            if (dbUser) {
+              token.id = dbUser.id;
+              token.role = dbUser.role;
+              token.name = dbUser.name || (token.name as string);
+              token.picture = dbUser.image || (token.picture as string);
+              return token;
+            }
+          } catch (dbErr) {
+            console.warn("Prisma lookup failed in jwt callback, falling back to in-memory:", dbErr);
+          }
+        }
+
+        // Last-resort fallback store
         const fallbackUser = await findUserByEmailFallback(email);
         if (fallbackUser) {
           token.id = fallbackUser.id;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { createUserFallback } from "@/lib/auth-store";
 
 export async function POST(request: Request) {
@@ -35,9 +35,7 @@ export async function POST(request: Request) {
 
     const requestedRole = payload.role === "recruiter" ? "recruiter" : "student";
 
-    const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
-
-    if (shouldUsePrisma) {
+    if (shouldUsePrisma()) {
       try {
         const existingUser = await prisma.user.findUnique({
           where: { email: normalizedEmail },

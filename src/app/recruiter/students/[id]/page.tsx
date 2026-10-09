@@ -341,13 +341,17 @@ export default function StudentDeepDivePage() {
           <div className="space-y-3 pt-2">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-muted mb-2">Verified Technical Skills</p>
-              <div className="flex flex-wrap gap-1.5">
-                {resume.skillsIdentified.map((skill, i) => (
-                  <span key={i} className="rounded-lg bg-soft border border-border px-2.5 py-1 text-[11px] font-semibold text-primary">
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              {resume.skillsIdentified && resume.skillsIdentified.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {resume.skillsIdentified.map((skill, i) => (
+                    <span key={i} className="rounded-lg bg-soft border border-border px-2.5 py-1 text-[11px] font-semibold text-primary">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted italic">No resume uploaded — skills have not been extracted yet.</p>
+              )}
             </div>
           </div>
         </div>

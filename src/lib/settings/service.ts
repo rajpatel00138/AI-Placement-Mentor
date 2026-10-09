@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { UserProfileSettings, UpdateProfileInput, UpdatePreferencesInput } from "./types";
 
 // In-memory user settings store for offline / dev fallback
@@ -69,9 +69,9 @@ function getFallbackUserSettings(userId: string): UserProfileSettings & { passwo
  * Get settings for a user
  */
 export async function getUserSettings(userId: string): Promise<UserProfileSettings | null> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
 
-  if (shouldUsePrisma) {
+  if (usePrisma) {
     try {
       const user = await (prisma as any).user.findFirst({
         where: {
@@ -120,10 +120,10 @@ export async function updateUserProfile(
   userId: string,
   input: UpdateProfileInput
 ): Promise<UserProfileSettings | null> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
   const now = new Date().toISOString();
 
-  if (shouldUsePrisma) {
+  if (usePrisma) {
     try {
       const updated = await (prisma as any).user.update({
         where: { id: userId },
@@ -189,10 +189,10 @@ export async function updateUserPreferences(
   userId: string,
   input: UpdatePreferencesInput
 ): Promise<UserProfileSettings | null> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
   const now = new Date().toISOString();
 
-  if (shouldUsePrisma) {
+  if (usePrisma) {
     try {
       const updated = await (prisma as any).user.update({
         where: { id: userId },
@@ -267,9 +267,9 @@ export async function changeUserPassword(
     return { success: false, error: "New password must be at least 6 characters long." };
   }
 
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
 
-  if (shouldUsePrisma) {
+  if (usePrisma) {
     try {
       const user = await (prisma as any).user.findFirst({
         where: {
@@ -319,9 +319,9 @@ export async function changeUserPassword(
 export async function deleteUserAccount(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true";
+  const usePrisma = shouldUsePrisma();
 
-  if (shouldUsePrisma) {
+  if (usePrisma) {
     try {
       const user = await (prisma as any).user.findFirst({
         where: {

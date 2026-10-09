@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma, shouldUsePrisma } from "@/lib/prisma";
 import { findUserByEmailFallback } from "@/lib/auth-store";
 
 export async function POST(request: Request) {
@@ -16,22 +16,24 @@ export async function POST(request: Request) {
 
     let actualRole: "student" | "recruiter" | null = null;
     let isValidPassword = false;
+    let dbCheckedSuccessfully = false;
 
-    const shouldUsePrisma = process.env.USE_PRISMA_PERSISTENCE === "true" || process.env.NODE_ENV === "production";
-
-    if (shouldUsePrisma) {
+    if (shouldUsePrisma()) {
       try {
         const user = await prisma.user.findUnique({ where: { email } });
+        dbCheckedSuccessfully = true;
         if (user) {
-          isValidPassword = await bcrypt.compare(password, user.password);
+          const storedHash = user.password || "";
+          isValidPassword = storedHash ? await bcrypt.compare(password, storedHash) : false;
           actualRole = (user.role as "student" | "recruiter") || "student";
         }
       } catch (err) {
-        console.warn("Prisma check failed, falling back to in-memory store", err);
+        console.warn("Prisma check failed, falling back to in-memory store:", err);
       }
     }
 
-    if (!actualRole) {
+    // Only fallback if Prisma is disabled or threw an error
+    if (!dbCheckedSuccessfully) {
       const fallbackUser = await findUserByEmailFallback(email);
       if (fallbackUser) {
         isValidPassword =
