@@ -436,7 +436,11 @@ export default function CompanyPrepView() {
                     <Search className="w-3.5 h-3.5 text-muted" />
                     <input
                       type="text"
-                      placeholder="Search 470+ companies (e.g. Adobe, Google, Uber)..."
+                      placeholder={
+                        companies.length > 0
+                          ? `Search ${companies.length} companies (e.g. Adobe, Google, Uber)...`
+                          : "Search companies (e.g. Adobe, Google, Uber)..."
+                      }
                       value={companySearch}
                       onChange={(e) => setCompanySearch(e.target.value)}
                       className="bg-transparent outline-none w-full text-xs text-primary placeholder-muted"

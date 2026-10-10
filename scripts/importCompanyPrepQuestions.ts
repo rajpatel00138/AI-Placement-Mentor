@@ -1,3 +1,4 @@
+import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { prisma } from "../src/lib/prisma";
@@ -222,8 +223,8 @@ async function main() {
 
   // Batch insert into Prisma in chunks of 500
   if (prismaAvailable) {
-    console.log("\n⚡ Step 3: Batch inserting questions into PostgreSQL via Prisma (chunks of 500)...");
-    const chunkSize = 500;
+    console.log("\n⚡ Step 3: Batch inserting questions into PostgreSQL via Prisma (chunks of 1000)...");
+    const chunkSize = 1000;
     let inserted = 0;
 
     for (let i = 0; i < allQuestions.length; i += chunkSize) {
@@ -234,9 +235,11 @@ async function main() {
           skipDuplicates: true,
         });
         inserted += chunk.length;
-        if (inserted % 5000 === 0 || inserted === allQuestions.length) {
-          console.log(`   → Inserted ${inserted}/${allQuestions.length} rows...`);
-        }
+        console.log(
+          `   → Inserted ${inserted}/${allQuestions.length} rows (${Math.round(
+            (inserted / allQuestions.length) * 100
+          )}%)...`
+        );
       } catch (err: any) {
         console.error(`   ❌ Failed to insert chunk starting at index ${i}:`, err.message);
       }

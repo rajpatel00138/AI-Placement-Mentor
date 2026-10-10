@@ -86,42 +86,49 @@ export async function getCompaniesList(): Promise<CompanyMeta[]> {
   if (shouldUsePrisma()) {
     try {
       if ((prisma as any).companyQuestion) {
-        const dbCompanies = await (prisma as any).companyQuestion.groupBy({
-          by: ["companyName"],
-          _count: { id: true },
-        });
+        const [timeframeGroups, diffGroups] = await Promise.all([
+          (prisma as any).companyQuestion.groupBy({
+            by: ["companyName", "timeframe"],
+            _count: { id: true },
+          }),
+          (prisma as any).companyQuestion.groupBy({
+            by: ["companyName", "difficulty"],
+            _count: { id: true },
+          }),
+        ]);
 
-        if (dbCompanies && dbCompanies.length > 0) {
-          const result: CompanyMeta[] = [];
-          for (const item of dbCompanies) {
-            const timeframes = await (prisma as any).companyQuestion.findMany({
-              where: { companyName: item.companyName },
-              distinct: ["timeframe"],
-              select: { timeframe: true },
-            });
+        if (diffGroups && diffGroups.length > 0) {
+          const map = new Map<string, CompanyMeta>();
 
-            const diffBreakdown = await (prisma as any).companyQuestion.groupBy({
-              by: ["difficulty"],
-              where: { companyName: item.companyName },
-              _count: { id: true },
-            });
-
-            const diffMap: Record<string, number> = { EASY: 0, MEDIUM: 0, HARD: 0 };
-            for (const d of diffBreakdown) {
-              diffMap[d.difficulty] = d._count.id;
+          for (const item of diffGroups) {
+            let meta = map.get(item.companyName);
+            if (!meta) {
+              meta = {
+                companyName: item.companyName,
+                slug: item.companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                totalQuestions: 0,
+                availableTimeframes: [],
+                easyCount: 0,
+                mediumCount: 0,
+                hardCount: 0,
+              };
+              map.set(item.companyName, meta);
             }
-
-            result.push({
-              companyName: item.companyName,
-              slug: item.companyName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-              totalQuestions: item._count.id,
-              availableTimeframes: timeframes.map((t: any) => t.timeframe),
-              easyCount: diffMap.EASY || 0,
-              mediumCount: diffMap.MEDIUM || 0,
-              hardCount: diffMap.HARD || 0,
-            });
+            const count = item._count.id;
+            meta.totalQuestions += count;
+            if (item.difficulty === "EASY") meta.easyCount += count;
+            else if (item.difficulty === "HARD") meta.hardCount += count;
+            else meta.mediumCount += count;
           }
-          return result.sort((a, b) => b.totalQuestions - a.totalQuestions);
+
+          for (const item of timeframeGroups) {
+            const meta = map.get(item.companyName);
+            if (meta && !meta.availableTimeframes.includes(item.timeframe)) {
+              meta.availableTimeframes.push(item.timeframe);
+            }
+          }
+
+          return Array.from(map.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
         }
       }
     } catch (err) {
@@ -188,9 +195,6 @@ export async function getCompanyQuestions(params: GetQuestionsParams) {
     studentId = "guest",
   } = params;
 
-  const allQuestions = loadQuestionsFromDisk();
-  const normalizedCompany = company.toLowerCase().trim().replace(/[-_]+/g, " ");
-
   // Load student progress store from Prisma
   const progressMap: Record<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED"> = {};
 
@@ -214,18 +218,53 @@ export async function getCompanyQuestions(params: GetQuestionsParams) {
     }
   }
 
-  // Find all questions for this company
-  let companyQuestions = allQuestions.filter((q) => {
-    const cNorm = q.companyName.toLowerCase().replace(/[-_]+/g, " ");
-    return cNorm === normalizedCompany || q.companyName.toLowerCase() === company.toLowerCase();
-  });
+  // Find all questions for this company (via Prisma with disk fallback)
+  let companyQuestions: CompanyQuestionItem[] = [];
+
+  if (shouldUsePrisma()) {
+    try {
+      const dbQuestions = await (prisma as any).companyQuestion.findMany({
+        where: {
+          companyName: {
+            equals: company,
+            mode: "insensitive",
+          },
+        },
+      });
+
+      if (dbQuestions && dbQuestions.length > 0) {
+        companyQuestions = dbQuestions.map((q: any) => ({
+          id: q.id,
+          companyName: q.companyName,
+          timeframe: q.timeframe,
+          leetcodeId: q.leetcodeId ?? null,
+          title: q.title,
+          difficulty: q.difficulty,
+          acceptanceRate: q.acceptanceRate ?? null,
+          frequency: q.frequency ?? null,
+          problemUrl: q.problemUrl,
+        }));
+      }
+    } catch (err) {
+      console.warn("Prisma query failed for company questions:", err);
+    }
+  }
 
   if (companyQuestions.length === 0) {
-    // Try matching slug
-    const slugMatch = company.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const allQuestions = loadQuestionsFromDisk();
+    const normalizedCompany = company.toLowerCase().trim().replace(/[-_]+/g, " ");
+
     companyQuestions = allQuestions.filter((q) => {
-      return q.companyName.toLowerCase().replace(/[^a-z0-9]/g, "") === slugMatch;
+      const cNorm = q.companyName.toLowerCase().replace(/[-_]+/g, " ");
+      return cNorm === normalizedCompany || q.companyName.toLowerCase() === company.toLowerCase();
     });
+
+    if (companyQuestions.length === 0) {
+      const slugMatch = company.toLowerCase().replace(/[^a-z0-9]/g, "");
+      companyQuestions = allQuestions.filter((q) => {
+        return q.companyName.toLowerCase().replace(/[^a-z0-9]/g, "") === slugMatch;
+      });
+    }
   }
 
   const activeCompanyName = companyQuestions.length > 0 ? companyQuestions[0].companyName : company;
