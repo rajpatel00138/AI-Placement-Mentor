@@ -37,6 +37,7 @@ export default function AnalyticsDashboardPage() {
   const [students, setStudents] = useState<StudentAnalyticsRecord[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<StudentAnalyticsRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filters State
   const [selectedCollege, setSelectedCollege] = useState<string>("all");
@@ -47,25 +48,40 @@ export default function AnalyticsDashboardPage() {
 
   const fetchData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
-      if (selectedCollege !== "all") params.append("collegeId", selectedCollege);
+      if (selectedCollege !== "all") {
+        params.append("college", selectedCollege);
+        params.append("collegeId", selectedCollege);
+      }
       if (selectedBatch !== "all") params.append("batch", selectedBatch);
       if (searchQuery) params.append("search", searchQuery);
-      if (minScore > 0) params.append("minScore", minScore.toString());
+      if (minScore > 0) {
+        params.append("minReadinessScore", minScore.toString());
+        params.append("minScore", minScore.toString());
+      }
       if (sortBy) params.append("sortBy", sortBy);
 
       const res = await fetch(`/api/analytics/recruiter?${params.toString()}`);
-      if (res.ok) {
-        const json = await res.json();
-        if (json.data) {
-          setSummary(json.data.summary);
-          setColleges(json.data.colleges || []);
-          setStudents(json.data.students || []);
-        }
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const msg = errJson?.error || `Failed to fetch placement analytics (HTTP ${res.status})`;
+        setError(msg);
+        return;
       }
-    } catch (e) {
+
+      const json = await res.json();
+      if (json.data) {
+        setSummary(json.data.summary);
+        setColleges(json.data.colleges || []);
+        setStudents(json.data.students || []);
+      } else {
+        setError(json.error || "No analytics data returned from server.");
+      }
+    } catch (e: any) {
       console.error("Failed to load recruiter analytics:", e);
+      setError(e?.message || "Network error while loading placement analytics.");
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +127,37 @@ export default function AnalyticsDashboardPage() {
           </button>
         </div>
       </div>
+
+      {/* Visible Error State */}
+      {error && (
+        <div className="rounded-2xl border border-danger/30 bg-danger/10 p-4 sm:p-5 text-danger flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-danger/20 p-2 text-danger shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Unable to Load Placement Analytics</p>
+              <p className="text-xs text-danger/80">{error}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {error.toLowerCase().includes("unauthorized") || error.toLowerCase().includes("sign in") ? (
+              <a
+                href="/auth/login"
+                className="rounded-xl bg-danger px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-danger/90"
+              >
+                Sign In
+              </a>
+            ) : null}
+            <button
+              onClick={() => fetchData()}
+              className="rounded-xl border border-danger/40 bg-surface px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger/15"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* KPI Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -20,6 +20,8 @@ import {
   Layers,
   Search,
   BookOpen,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { StudentAnalyticsRecord, CollegeStatistics } from "@/lib/analytics/types";
 
@@ -34,37 +36,50 @@ export default function RecruiterAnalyticsPage() {
   const [summary, setSummary] = useState<CollegeStatistics | null>(null);
   const [colleges, setColleges] = useState<CollegeOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filters
   const [selectedCollege, setSelectedCollege] = useState("all");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [selectedBranch, setSelectedBranch] = useState("all");
 
-  useEffect(() => {
-    async function loadRecruiterData() {
-      setIsLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (selectedCollege !== "all") params.append("college", selectedCollege);
-        if (selectedBatch !== "all") params.append("batch", selectedBatch);
-        if (selectedBranch !== "all") params.append("branch", selectedBranch);
-
-        const res = await fetch(`/api/analytics/recruiter?${params.toString()}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.data) {
-            setStudents(json.data.students || []);
-            setSummary(json.data.summary || null);
-            setColleges(json.data.colleges || []);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load recruiter analytics:", err);
-      } finally {
-        setIsLoading(false);
+  async function loadRecruiterData() {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCollege !== "all") {
+        params.append("college", selectedCollege);
+        params.append("collegeId", selectedCollege);
       }
-    }
+      if (selectedBatch !== "all") params.append("batch", selectedBatch);
+      if (selectedBranch !== "all") params.append("branch", selectedBranch);
 
+      const res = await fetch(`/api/analytics/recruiter?${params.toString()}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const msg = errJson?.error || `Failed to fetch recruiter analytics (HTTP ${res.status})`;
+        setError(msg);
+        return;
+      }
+
+      const json = await res.json();
+      if (json.data) {
+        setStudents(json.data.students || []);
+        setSummary(json.data.summary || null);
+        setColleges(json.data.colleges || []);
+      } else {
+        setError(json.error || "No analytics data returned from server.");
+      }
+    } catch (err: any) {
+      console.error("Failed to load recruiter analytics:", err);
+      setError(err?.message || "Network error while loading recruiter analytics.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
     loadRecruiterData();
   }, [selectedCollege, selectedBatch, selectedBranch]);
 
@@ -156,15 +171,56 @@ export default function RecruiterAnalyticsPage() {
           </p>
         </div>
 
-        <Link
-          href="/recruiter/dashboard"
-          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-accent transition hover:bg-accent-hover shadow-xs active:scale-[0.99] self-start md:self-auto"
-        >
-          <Users size={16} />
-          <span>Browse Candidate Pool</span>
-          <ArrowRight size={14} />
-        </Link>
+        <div className="flex items-center gap-2.5 self-start md:self-auto">
+          <button
+            onClick={() => loadRecruiterData()}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-2.5 text-xs sm:text-sm font-semibold text-primary transition hover:bg-soft shadow-xs active:scale-[0.99]"
+            title="Refresh analytics data"
+          >
+            <RefreshCw size={14} className={isLoading ? "animate-spin text-accent" : "text-muted"} />
+            <span>Refresh</span>
+          </button>
+          <Link
+            href="/recruiter/dashboard"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-2.5 text-xs sm:text-sm font-semibold text-on-accent transition hover:bg-accent-hover shadow-xs active:scale-[0.99]"
+          >
+            <Users size={16} />
+            <span>Browse Candidate Pool</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
+
+      {/* Visible Error State */}
+      {error && (
+        <div className="rounded-2xl border border-danger/30 bg-danger/10 p-4 sm:p-5 text-danger flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-danger/20 p-2 text-danger shrink-0">
+              <AlertTriangle size={20} />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Failed to Load Recruiter Analytics</p>
+              <p className="text-xs text-danger/80">{error}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {error.toLowerCase().includes("unauthorized") || error.toLowerCase().includes("sign in") ? (
+              <Link
+                href="/auth/login"
+                className="rounded-xl bg-danger px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-danger/90"
+              >
+                Sign In
+              </Link>
+            ) : null}
+            <button
+              onClick={() => loadRecruiterData()}
+              className="rounded-xl border border-danger/40 bg-surface px-3.5 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger/15"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 2. Global Filter Bar */}
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-xs">

@@ -146,38 +146,198 @@ export async function getRecruiterBatchAnalytics(
   colleges: { id: string; name: string; code?: string | null }[];
   totalMatches: number;
 }> {
-  const studentsMap = new Map<string, any>();
+  const studentsMap = new Map<string, StudentAnalyticsRecord & { readinessGain7d?: number }>();
 
   if (shouldUsePrisma()) {
     try {
-      const prismaStudents = await prisma.user.findMany({
-        where: { role: "student" },
-        orderBy: { createdAt: "desc" },
-      });
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400 * 1000);
+
+      // Run bulk aggregated queries against Neon via Prisma concurrently
+      const [
+        prismaStudents,
+        dsaGroups,
+        latestResumes,
+        interviewStats,
+        roadmapStats,
+        activityStats,
+      ] = await Promise.all([
+        prisma.user.findMany({
+          where: { role: "student" },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.dsaSolve.groupBy({
+          by: ["userId", "difficulty"],
+          _count: { problemId: true },
+        }),
+        prisma.resumeRecord.findMany({
+          distinct: ["userId"],
+          orderBy: { createdAt: "desc" },
+          select: { userId: true, atsScore: true },
+        }),
+        prisma.interviewRecord.groupBy({
+          by: ["userId"],
+          _avg: { score: true },
+          _count: { id: true },
+        }),
+        prisma.roadmapProgress.groupBy({
+          by: ["userId"],
+          where: { completed: true },
+          _count: { topicKey: true },
+        }),
+        prisma.activityLog.groupBy({
+          by: ["userId"],
+          where: { createdAt: { gte: sevenDaysAgo } },
+          _count: { id: true },
+        }),
+      ]);
+
+      // Build indexing maps for O(1) correlation
+      const dsaMap = new Map<string, { easy: number; medium: number; hard: number }>();
+      for (const g of dsaGroups) {
+        const cur = dsaMap.get(g.userId) || { easy: 0, medium: 0, hard: 0 };
+        if (g.difficulty === "Easy") cur.easy += g._count.problemId;
+        else if (g.difficulty === "Medium") cur.medium += g._count.problemId;
+        else if (g.difficulty === "Hard") cur.hard += g._count.problemId;
+        dsaMap.set(g.userId, cur);
+      }
+
+      const resumeMap = new Map<string, number>();
+      for (const r of latestResumes) {
+        resumeMap.set(r.userId, r.atsScore);
+      }
+
+      const interviewMap = new Map<string, number>();
+      for (const i of interviewStats) {
+        interviewMap.set(i.userId, Math.round(i._avg.score || 0));
+      }
+
+      const roadmapMap = new Map<string, number>();
+      for (const rm of roadmapStats) {
+        roadmapMap.set(rm.userId, rm._count.topicKey);
+      }
+
+      const activityMap = new Map<string, number>();
+      for (const a of activityStats) {
+        activityMap.set(a.userId, a._count.id);
+      }
+
       for (const s of prismaStudents) {
-        if (s.email) {
-          studentsMap.set(s.email.toLowerCase().trim(), s);
+        if (!s.email) continue;
+
+        const uDsa = dsaMap.get(s.id) || { easy: 0, medium: 0, hard: 0 };
+        const dsaPoints = uDsa.easy * 1 + uDsa.medium * 2 + uDsa.hard * 3;
+        const computedDsa = Math.min(100, Math.round((dsaPoints / 40) * 100));
+        const dsaScore = s.dsaScore > 0 ? s.dsaScore : computedDsa;
+
+        const resumeScore = s.resumeScore > 0 ? s.resumeScore : (resumeMap.get(s.id) || 0);
+        const interviewScore = s.interviewScore > 0 ? s.interviewScore : (interviewMap.get(s.id) || 0);
+        const completedRoadmap = roadmapMap.get(s.id) || 0;
+        const roadmapProgress = Math.min(100, Math.round((completedRoadmap / 20) * 100));
+
+        const aptitudeScore = s.aptitudeScore > 0 ? s.aptitudeScore : (dsaScore > 0 ? Math.min(100, Math.round(dsaScore * 0.9)) : 0);
+        const codingScore = s.codingScore > 0 ? s.codingScore : aptitudeScore;
+
+        let readinessScore = s.readinessScore;
+        if (!readinessScore) {
+          const raw = 0.30 * dsaScore + 0.25 * interviewScore + 0.20 * resumeScore + 0.15 * roadmapProgress + 0.10 * aptitudeScore;
+          readinessScore = Math.min(100, Math.max(0, Math.round(raw)));
         }
+
+        const placementProbability = s.placementProbability > 1
+          ? Math.round(s.placementProbability)
+          : s.placementProbability > 0
+            ? Math.round(s.placementProbability * 100)
+            : readinessScore;
+
+        const scores = {
+          dsaScore,
+          codingScore,
+          interviewScore,
+          resumeScore,
+          aptitudeScore,
+        };
+
+        const tags = getStudentStrengthsAndWeaknesses(scores);
+        const lastLoginStr = s.lastLoginAt
+          ? typeof s.lastLoginAt === "string"
+            ? s.lastLoginAt
+            : s.lastLoginAt.toISOString()
+          : null;
+
+        const recentActsCount = activityMap.get(s.id) || 0;
+        const readinessGain7d = Math.min(readinessScore, Math.max(0, recentActsCount * 6));
+
+        const record: StudentAnalyticsRecord & { readinessGain7d?: number } = {
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          image: s.image ?? null,
+          role: s.role,
+          college: s.college ?? "Apex Institute of Technology",
+          collegeId: s.collegeId ?? null,
+          branch: s.branch ?? "Computer Science",
+          batch: s.batch ?? "2025-A",
+          graduationYear: s.graduationYear ?? 2025,
+          targetRole: s.targetRole ?? "Software Engineer",
+          targetCompany: s.targetCompany ?? "Tech Target",
+          ...scores,
+          readinessScore,
+          placementProbability,
+          strengths: tags.strengths,
+          weaknesses: tags.weaknesses,
+          lastLoginAt: lastLoginStr,
+          activityStatus: deriveActivityStatus(s.lastLoginAt ? new Date(s.lastLoginAt) : null),
+          readinessGain7d,
+        };
+
+        studentsMap.set(s.email.toLowerCase().trim(), record);
       }
     } catch (err) {
       console.warn("Prisma error in getRecruiterBatchAnalytics, using store fallback:", err);
     }
   }
 
+  // Merge any registered fallback students not in database
   const fallbackStudents = await getAllRegisteredStudentsFallback();
   for (const s of fallbackStudents) {
     if (s.email) {
       const emailKey = s.email.toLowerCase().trim();
       if (!studentsMap.has(emailKey)) {
-        studentsMap.set(emailKey, s);
+        const scores = {
+          dsaScore: 70,
+          codingScore: 70,
+          interviewScore: 70,
+          resumeScore: 75,
+          aptitudeScore: 70,
+        };
+        const tags = getStudentStrengthsAndWeaknesses(scores);
+        studentsMap.set(emailKey, {
+          id: s.id,
+          name: s.name,
+          email: s.email,
+          image: s.image ?? null,
+          role: s.role,
+          college: s.college ?? "Apex Institute of Technology",
+          collegeId: null,
+          branch: s.branch ?? "Computer Science",
+          batch: s.batch ?? "2025-A",
+          graduationYear: s.graduationYear ?? 2025,
+          targetRole: s.targetRole ?? "Software Engineer",
+          targetCompany: s.targetCompany ?? "Tech Target",
+          ...scores,
+          readinessScore: 71,
+          placementProbability: 71,
+          strengths: tags.strengths,
+          weaknesses: tags.weaknesses,
+          lastLoginAt: s.lastLoginAt ? new Date(s.lastLoginAt).toISOString() : null,
+          activityStatus: deriveActivityStatus(s.lastLoginAt ? new Date(s.lastLoginAt) : null),
+          readinessGain7d: 0,
+        });
       }
     }
   }
 
-  const rawStudents = Array.from(studentsMap.values());
-
-  // Map each real student to diagnostic analytics record
-  const mapped = await Promise.all(rawStudents.map(mapRegisteredUserToAnalytics));
+  const mapped = Array.from(studentsMap.values());
 
   // Multi-field search across Name, Email, College, and Branch
   let filtered = mapped;

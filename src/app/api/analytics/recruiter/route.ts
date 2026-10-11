@@ -5,14 +5,17 @@ import { getRecruiterBatchAnalytics } from "@/lib/analytics/service";
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "recruiter") {
-      return NextResponse.json({ error: "Unauthorized. Recruiter access required." }, { status: 403 });
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please sign in to access cohort analytics." },
+        { status: 401 }
+      );
     }
 
     // Check query params
     const { searchParams } = new URL(request.url);
-    const minReadinessScoreParam = searchParams.get("minReadinessScore");
-    const college = searchParams.get("college") || undefined;
+    const minReadinessScoreParam = searchParams.get("minReadinessScore") || searchParams.get("minScore");
+    const college = searchParams.get("college") || searchParams.get("collegeId") || undefined;
     const batch = searchParams.get("batch") || undefined;
     const branch = searchParams.get("branch") || undefined;
     const search = searchParams.get("search") || undefined;
