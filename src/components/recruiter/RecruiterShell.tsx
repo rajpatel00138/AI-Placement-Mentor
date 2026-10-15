@@ -21,6 +21,7 @@ import {
   Building2,
   Briefcase,
 } from "lucide-react";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface RecruiterShellProps {
   children: React.ReactNode;
@@ -144,8 +145,15 @@ export default function RecruiterShell({
         <div className="p-3.5 border-t border-border bg-elevated/40 shrink-0">
           <div className="flex items-center justify-between gap-2 p-2 rounded-2xl border border-border bg-surface shadow-xs">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs shadow-xs">
-                {userInitials}
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs shadow-xs overflow-hidden">
+                <UserAvatar
+                  src={user?.image}
+                  name={user?.name}
+                  size={36}
+                  className="h-full w-full object-cover"
+                  fallbackClassName="text-xs font-bold text-on-accent"
+                  defaultInitials={userInitials}
+                />
               </div>
               <div className="truncate">
                 <p className="text-xs font-bold text-primary truncate">
@@ -213,8 +221,15 @@ export default function RecruiterShell({
               <div className="p-4 border-t border-border bg-elevated/40 shrink-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs">
-                      {userInitials}
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs overflow-hidden">
+                      <UserAvatar
+                        src={user?.image}
+                        name={user?.name}
+                        size={32}
+                        className="h-full w-full object-cover"
+                        fallbackClassName="text-xs font-bold text-on-accent"
+                        defaultInitials={userInitials}
+                      />
                     </div>
                     <div className="truncate">
                       <p className="text-xs font-bold text-primary truncate">

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import UserAvatar from "@/components/ui/UserAvatar";
 import Link from "next/link";
 import { Edit3, Sparkles } from "lucide-react";
 
@@ -11,13 +11,6 @@ type ProfileHeaderProps = {
 };
 
 export default function ProfileHeader({ user }: ProfileHeaderProps) {
-  const initials =
-    user?.name
-      ?.split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase() || "ST";
-
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border bg-surface p-6 sm:p-8 shadow-sm">
       {/* Ambient background glows */}
@@ -29,19 +22,15 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
         <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
           {/* Avatar */}
           <div className="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-accent/30 bg-accent/15 text-accent shadow-sm">
-            {user?.image ? (
-              <Image
-                src={user.image}
-                alt={user.name ?? "User"}
-                width={96}
-                height={96}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="text-2xl sm:text-3xl font-extrabold text-accent">
-                {initials}
-              </span>
-            )}
+            <UserAvatar
+              src={user?.image}
+              name={user?.name}
+              size={96}
+              className="h-full w-full object-cover"
+              fallbackClassName="text-2xl sm:text-3xl font-extrabold text-accent"
+              defaultInitials="ST"
+              priority
+            />
           </div>
 
           {/* User Info */}

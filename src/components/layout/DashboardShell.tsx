@@ -26,6 +26,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { navigationItems } from "@/constants/navigation";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -157,11 +158,14 @@ export default function DashboardShell({
               className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-80 transition"
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs shadow-xs overflow-hidden">
-                {user?.image ? (
-                  <img src={user.image} alt={user.name || "User"} className="h-full w-full object-cover" />
-                ) : (
-                  userInitials
-                )}
+                <UserAvatar
+                  src={user?.image}
+                  name={user?.name}
+                  size={36}
+                  className="h-full w-full object-cover"
+                  fallbackClassName="text-xs font-bold text-on-accent"
+                  defaultInitials={userInitials}
+                />
               </div>
               <div className="truncate">
                 <p className="text-xs font-bold text-primary truncate">
@@ -233,11 +237,14 @@ export default function DashboardShell({
                     className="flex items-center gap-2.5 min-w-0"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent font-bold text-xs overflow-hidden">
-                      {user?.image ? (
-                        <img src={user.image} alt={user.name || "User"} className="h-full w-full object-cover" />
-                      ) : (
-                        userInitials
-                      )}
+                      <UserAvatar
+                        src={user?.image}
+                        name={user?.name}
+                        size={32}
+                        className="h-full w-full object-cover"
+                        fallbackClassName="text-xs font-bold text-on-accent"
+                        defaultInitials={userInitials}
+                      />
                     </div>
                     <div className="truncate">
                       <p className="text-xs font-bold text-primary truncate">
@@ -335,10 +342,23 @@ export default function DashboardShell({
               {/* User Profile Avatar Icon Link */}
               <Link
                 href="/dashboard/profile"
-                className="rounded-2xl border border-border bg-base p-2 text-muted hover:bg-soft hover:text-primary transition"
+                className="flex h-9 w-9 items-center justify-center rounded-2xl border border-border bg-base text-muted hover:bg-soft hover:text-primary transition overflow-hidden p-0.5"
                 title="Profile"
               >
-                <UserCircle2 size={18} />
+                {user?.image ? (
+                  <UserAvatar
+                    src={user.image}
+                    name={user.name}
+                    size={36}
+                    className="h-full w-full rounded-xl object-cover"
+                    fallbackClassName="text-xs font-bold text-accent"
+                    defaultInitials={userInitials}
+                  />
+                ) : user?.name ? (
+                  <span className="text-xs font-bold text-accent">{userInitials}</span>
+                ) : (
+                  <UserCircle2 size={18} />
+                )}
               </Link>
             </div>
           </div>

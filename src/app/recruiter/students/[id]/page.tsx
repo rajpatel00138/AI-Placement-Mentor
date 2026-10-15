@@ -28,6 +28,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { StudentDeepDiveProfile } from "@/lib/recruiter/types";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 export default function StudentDeepDivePage() {
   const params = useParams();
@@ -129,22 +130,14 @@ export default function StudentDeepDivePage() {
           {/* Left: Avatar & Basic Info */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
             <div className="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-accent/30 bg-accent/15 text-accent shadow-sm">
-              {student.image ? (
-                <img
-                  src={student.image}
-                  alt={student.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-2xl sm:text-3xl font-black">
-                  {student.name
-                    .split(" ")
-                    .map((w) => w[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </span>
-              )}
+              <UserAvatar
+                src={student.image}
+                name={student.name}
+                size={96}
+                className="h-full w-full object-cover"
+                fallbackClassName="text-2xl sm:text-3xl font-black text-accent"
+                defaultInitials="ST"
+              />
             </div>
 
             <div className="space-y-1">

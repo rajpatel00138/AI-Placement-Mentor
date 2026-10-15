@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import UserAvatar from "@/components/ui/UserAvatar";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -330,15 +330,14 @@ export default function RecruiterDashboardPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-accent/30 bg-accent/15 text-accent font-bold text-xs shadow-xs overflow-hidden">
-                            {student.image ? (
-                              <img
-                                src={student.image}
-                                alt={student.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              userInitials
-                            )}
+                            <UserAvatar
+                              src={student.image}
+                              name={student.name}
+                              size={40}
+                              className="h-full w-full object-cover"
+                              fallbackClassName="font-bold text-accent text-xs"
+                              defaultInitials={userInitials}
+                            />
                           </div>
                           <div className="min-w-0">
                             <p className="font-bold text-primary truncate">{student.name}</p>
