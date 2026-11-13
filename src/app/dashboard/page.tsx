@@ -75,7 +75,7 @@ export default function DashboardPage() {
     {
       title: "Placement Readiness",
       value: `${readiness}%`,
-      detail: readiness === 0 ? "Start solving tasks to build score" : `Placement Probability: ${placementProb}%`,
+      detail: readiness === 0 ? "Heuristic indicator • 0% zero state" : `Heuristic indicator • Placement Prob: ${placementProb}%`,
       trend: metrics?.readinessGain7d ? `+${metrics.readinessGain7d}% this week` : readiness > 0 ? "Active progress" : "Zero state",
       accent: readiness >= 70 ? "bg-success/15 text-success border border-success/30" : "bg-accent/15 text-accent border border-accent/30",
       icon: <Target className="h-5 w-5" />,

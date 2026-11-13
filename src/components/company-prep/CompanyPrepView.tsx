@@ -65,7 +65,7 @@ const TIMEFRAME_LABELS: Record<string, string> = {
   thirty_days: "30 Days",
   three_months: "3 Months",
   six_months: "6 Months",
-  more_than_six_months: "6+ Months",
+  more_than_six_months: "1 Year",
   one_year: "1 Year",
   more_than_two_years: "2+ Years",
   all_time: "All Time",

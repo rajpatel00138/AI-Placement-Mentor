@@ -227,7 +227,9 @@ async function main() {
   console.log("🌱 Starting database seeding...");
 
   // Match the exact bcryptjs 10-round hash used by Auth.js credential verification
-  const defaultPassword = await bcrypt.hash("Password@123", 10);
+  // Configurable via DEMO_USER_PASSWORD environment variable
+  const demoPassword = process.env.DEMO_USER_PASSWORD || "Password@123";
+  const defaultPassword = await bcrypt.hash(demoPassword, 10);
 
   // 1. Seed Colleges
   console.log(`🏫 Seeding ${MOCK_COLLEGES.length} colleges...`);

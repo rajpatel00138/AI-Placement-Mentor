@@ -39,14 +39,14 @@ export default function CompanySelector() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg sm:text-xl font-bold text-heading">
+            <h2 className="text-lg sm:text-xl font-bold text-primary">
               Select Target Company
             </h2>
             <span className="rounded-full bg-accent/10 border border-accent/20 px-2.5 py-0.5 text-[11px] font-semibold text-accent">
               {TARGET_COMPANIES.length} Available
             </span>
           </div>
-          <p className="mt-1 text-xs sm:text-sm text-body-muted">
+          <p className="mt-1 text-xs sm:text-sm text-muted">
             Practice interview rounds tailored to company-specific hiring patterns & domain expectations.
           </p>
         </div>
@@ -71,13 +71,13 @@ export default function CompanySelector() {
           placeholder="Search target company by name, sector, or tag (e.g. Google, FinTech, FAANG)..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-2xl border border-border bg-base px-4 py-3 pl-11 pr-10 text-sm font-medium text-heading placeholder:text-slate-400 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs"
+          className="w-full rounded-2xl border border-border bg-base px-4 py-3 pl-11 pr-10 text-sm font-medium text-primary placeholder:text-slate-400 outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs"
         />
 
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:text-heading hover:bg-soft transition"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:text-primary hover:bg-soft transition"
             title="Clear search"
           >
             <X size={16} />
@@ -102,7 +102,7 @@ export default function CompanySelector() {
               className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
                 isCatActive
                   ? "bg-accent text-on-accent shadow-2xs"
-                  : "bg-base border border-border text-body-muted hover:text-heading hover:bg-soft"
+                  : "bg-base border border-border text-muted hover:text-primary hover:bg-soft"
               }`}
             >
               <span>{cat.label}</span>
@@ -110,7 +110,7 @@ export default function CompanySelector() {
                 className={`text-[10px] rounded-md px-1.5 py-0.2 ${
                   isCatActive
                     ? "bg-white/20 text-white"
-                    : "bg-soft text-body-muted"
+                    : "bg-soft text-muted"
                 }`}
               >
                 {count}
@@ -134,8 +134,8 @@ export default function CompanySelector() {
                   onClick={() => setCompany(company.name)}
                   className={`group relative flex items-center justify-between rounded-2xl border p-3.5 sm:p-4 text-left transition-all duration-200 cursor-pointer ${
                     active
-                      ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
-                      : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
+                      ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent"
+                      : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10"
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -151,12 +151,18 @@ export default function CompanySelector() {
 
                     <div className="truncate">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-heading truncate">
+                        <span
+                          className={`text-sm font-bold truncate transition ${
+                            active
+                              ? "text-primary"
+                              : "text-primary group-hover:text-accent"
+                          }`}
+                        >
                           {company.name}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[11px] font-medium text-body-muted truncate">
+                        <span className="text-[11px] font-medium text-muted truncate">
                           {company.tag || company.category}
                         </span>
                       </div>
@@ -175,10 +181,10 @@ export default function CompanySelector() {
         ) : (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-12 text-center bg-base/50">
             <Building2 className="h-10 w-10 text-slate-400 mb-2 opacity-50" />
-            <p className="text-sm font-semibold text-heading">
+            <p className="text-sm font-semibold text-primary">
               No companies match &quot;{search}&quot;
             </p>
-            <p className="text-xs text-body-muted mt-1 max-w-xs">
+            <p className="text-xs text-muted mt-1 max-w-xs">
               Try adjusting your search terms or switch category filter to &quot;All Companies&quot;.
             </p>
             <button
@@ -195,13 +201,13 @@ export default function CompanySelector() {
       </div>
 
       {/* Footer Info */}
-      <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs text-body-muted">
+      <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs text-muted">
         <span>
           Showing <strong>{filteredCompanies.length}</strong> of {TARGET_COMPANIES.length} companies
         </span>
         {selectedCompanyObj && (
           <span className="truncate max-w-[200px] text-right">
-            Selected: <strong className="text-heading">{selectedCompanyObj.name}</strong> ({selectedCompanyObj.category})
+            Selected: <strong className="text-primary">{selectedCompanyObj.name}</strong> ({selectedCompanyObj.category})
           </span>
         )}
       </div>

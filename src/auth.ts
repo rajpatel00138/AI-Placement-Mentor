@@ -97,7 +97,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
+          const configuredDemoPassword = process.env.DEMO_USER_PASSWORD || "Password@123";
           const isValidPassword =
+            (process.env.DEMO_USER_PASSWORD && password === process.env.DEMO_USER_PASSWORD) ||
+            password === configuredDemoPassword ||
             password === "Password@123" ||
             password === "password123" ||
             (fallbackUser.password ? await bcrypt.compare(password, fallbackUser.password) : false);

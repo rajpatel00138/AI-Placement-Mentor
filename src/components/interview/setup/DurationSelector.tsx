@@ -47,10 +47,10 @@ export default function DurationSelector() {
         </div>
 
         <div>
-          <h2 className="text-base font-bold text-heading">
+          <h2 className="text-base font-bold text-primary">
             Interview Duration
           </h2>
-          <p className="text-xs text-body-muted mt-0.5">
+          <p className="text-xs text-muted mt-0.5">
             Select the allocated time for your session.
           </p>
         </div>
@@ -65,18 +65,24 @@ export default function DurationSelector() {
               key={duration.id}
               type="button"
               onClick={() => setDuration(duration.id)}
-              className={`w-full rounded-2xl border p-3.5 sm:p-4 text-left transition-all duration-200 cursor-pointer ${
+              className={`group w-full rounded-2xl border p-3.5 sm:p-4 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
-                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10"
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-heading">
+                  <h3
+                    className={`text-sm font-bold transition ${
+                      active
+                        ? "text-primary"
+                        : "text-primary group-hover:text-accent"
+                    }`}
+                  >
                     {duration.title}
                   </h3>
-                  <p className="mt-0.5 text-xs text-body-muted">
+                  <p className="mt-0.5 text-xs text-muted">
                     {duration.subtitle}
                   </p>
                 </div>

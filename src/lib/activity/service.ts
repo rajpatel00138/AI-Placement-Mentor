@@ -518,23 +518,25 @@ export async function getUserPerformance(userId: string): Promise<UserPerformanc
 
   // D. Roadmap Progress: 20 milestones target
   const roadmapProgress = Math.min(100, Math.round((completedTopicsCount / 20) * 100));
+  const codingScore = roadmapProgress;
 
   // E. Aptitude Score (Derived from problem-solving consistency or default 0 for fresh user)
   const aptitudeScore = dsaSolvesList.length > 0 ? Math.min(100, Math.round(dsaScore * 0.9)) : 0;
 
-  // F. Explicit Placement Readiness Formula:
-  // 30% DSA + 25% Interview + 20% Resume ATS + 15% Roadmap + 10% Aptitude
+  // F. Explicit Placement Readiness Formula (per research paper):
+  // 30% DSA + 25% Coding + 20% Interview + 15% Resume ATS + 10% Aptitude
   const rawReadiness =
     0.30 * dsaScore +
-    0.25 * interviewScore +
-    0.20 * resumeScore +
-    0.15 * roadmapProgress +
+    0.25 * codingScore +
+    0.20 * interviewScore +
+    0.15 * resumeScore +
     0.10 * aptitudeScore;
 
   const readinessScore = Math.min(100, Math.max(0, Math.round(rawReadiness)));
 
-  // G. Placement Probability is formatted strictly as percentage (0-100%)
-  const placementProbability = readinessScore;
+  // G. Placement Probability via standard logistic formula (midpoint 55, k 0.08)
+  const logisticProb = 1 / (1 + Math.exp(-0.08 * (readinessScore - 55)));
+  const placementProbability = readinessScore === 0 ? 0 : Math.min(99, Math.max(1, Math.round(logisticProb * 100)));
 
   // Format activities
   const formattedActivities = activitiesList.map((a) => {

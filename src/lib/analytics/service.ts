@@ -239,15 +239,12 @@ export async function getRecruiterBatchAnalytics(
 
         let readinessScore = s.readinessScore;
         if (!readinessScore) {
-          const raw = 0.30 * dsaScore + 0.25 * interviewScore + 0.20 * resumeScore + 0.15 * roadmapProgress + 0.10 * aptitudeScore;
+          const raw = 0.30 * dsaScore + 0.25 * codingScore + 0.20 * interviewScore + 0.15 * resumeScore + 0.10 * aptitudeScore;
           readinessScore = Math.min(100, Math.max(0, Math.round(raw)));
         }
 
-        const placementProbability = s.placementProbability > 1
-          ? Math.round(s.placementProbability)
-          : s.placementProbability > 0
-            ? Math.round(s.placementProbability * 100)
-            : readinessScore;
+        const logisticProb = 1 / (1 + Math.exp(-0.08 * (readinessScore - 55)));
+        const placementProbability = readinessScore === 0 ? 0 : Math.min(99, Math.max(1, Math.round(logisticProb * 100)));
 
         const scores = {
           dsaScore,

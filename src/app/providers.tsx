@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange scriptProps={{ async: true }}>
         {children}
       </ThemeProvider>
     </SessionProvider>

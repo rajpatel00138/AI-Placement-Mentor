@@ -92,11 +92,10 @@ function LoginFormContent() {
 
       // 3. Route according to verified role
       if (selectedRole === "recruiter") {
-        router.push("/recruiter/dashboard");
+        window.location.href = "/recruiter/dashboard";
       } else {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }
-      router.refresh();
     } catch (err) {
       console.error("Login submission error:", err);
       setError("An unexpected error occurred. Please try again.");

@@ -1,0 +1,25 @@
+John Doe
+Email: john@example.com
+
+Objective:
+Looking for an entry level software engineer job in a good IT company where I can apply my knowledge.
+
+Education:
+B.Tech Student (2020-2024)
+College of Engineering
+
+Projects:
+Simple Calculator Application
+- Made a calculator using HTML, CSS and simple JavaScript.
+- Handled basic addition, subtraction, multiplication and division operations.
+
+Basic Todo List
+- Worked on a todo list website where user can add and remove tasks.
+- Used JavaScript for DOM manipulation.
+
+Skills:
+C, Java, HTML, CSS, Basics of Python.
+
+Hobbies:
+Playing cricket, reading books, listening to music.
+

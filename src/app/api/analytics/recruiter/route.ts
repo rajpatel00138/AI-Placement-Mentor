@@ -12,6 +12,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const userRole = (session.user as any).role;
+    if (userRole !== "recruiter" && userRole !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden. Cohort-wide analytics are restricted to recruiters." },
+        { status: 403 }
+      );
+    }
+
     // Check query params
     const { searchParams } = new URL(request.url);
     const minReadinessScoreParam = searchParams.get("minReadinessScore") || searchParams.get("minScore");

@@ -37,11 +37,11 @@ export default function InterviewSetup({
             <span>AI Mock Interview Setup</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-heading">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-primary">
             Configure Your Interview
           </h1>
 
-          <p className="max-w-3xl text-sm sm:text-base text-body-muted leading-relaxed font-normal">
+          <p className="max-w-3xl text-sm sm:text-base text-muted leading-relaxed font-normal">
             Choose interview type, target company, duration, and difficulty level.
             Our AI generates tailored questions and provides actionable evaluation feedback after your session.
           </p>
@@ -68,7 +68,7 @@ export default function InterviewSetup({
               <div className="rounded-xl bg-accent/10 border border-accent/30 p-2 text-accent">
                 <ListChecks size={18} />
               </div>
-              <h2 className="text-base font-bold text-heading">
+              <h2 className="text-base font-bold text-primary">
                 Number of Questions
               </h2>
             </div>
@@ -76,14 +76,14 @@ export default function InterviewSetup({
             <select
               value={state.numberOfQuestions || 5}
               onChange={(e) => setNumberOfQuestions(Number(e.target.value))}
-              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-heading outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
+              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-primary outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
             >
-              <option value="5" className="bg-surface text-heading">5 Questions (Recommended)</option>
-              <option value="10" className="bg-surface text-heading">10 Questions</option>
-              <option value="15" className="bg-surface text-heading">15 Questions</option>
-              <option value="20" className="bg-surface text-heading">20 Questions</option>
-              <option value="50" className="bg-surface text-heading">50 Questions</option>
-              <option value="100" className="bg-surface text-heading">100 Questions</option>
+              <option value="5" className="bg-surface text-primary">5 Questions (Recommended)</option>
+              <option value="10" className="bg-surface text-primary">10 Questions</option>
+              <option value="15" className="bg-surface text-primary">15 Questions</option>
+              <option value="20" className="bg-surface text-primary">20 Questions</option>
+              <option value="50" className="bg-surface text-primary">50 Questions</option>
+              <option value="100" className="bg-surface text-primary">100 Questions</option>
             </select>
           </div>
 
@@ -93,7 +93,7 @@ export default function InterviewSetup({
               <div className="rounded-xl bg-accent/10 border border-accent/30 p-2 text-accent">
                 <Languages size={18} />
               </div>
-              <h2 className="text-base font-bold text-heading">
+              <h2 className="text-base font-bold text-primary">
                 Language
               </h2>
             </div>
@@ -101,10 +101,10 @@ export default function InterviewSetup({
             <select
               value={state.language || "English"}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-heading outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
+              className="w-full rounded-2xl border border-border bg-base px-4 py-3 text-sm font-medium text-primary outline-none transition focus:border-accent focus:ring-1 focus:ring-accent shadow-xs cursor-pointer"
             >
-              <option value="English" className="bg-surface text-heading">English</option>
-              <option value="Hinglish" className="bg-surface text-heading">Hinglish</option>
+              <option value="English" className="bg-surface text-primary">English</option>
+              <option value="Hinglish" className="bg-surface text-primary">Hinglish</option>
             </select>
           </div>
 

@@ -28,7 +28,8 @@ function ensureSeeded() {
     globalWithUsers.__placementMentorUsers = new Map<string, StoredUser>();
   }
 
-  const defaultPasswordHash = bcrypt.hashSync("Password@123", 10);
+  const demoPassword = process.env.DEMO_USER_PASSWORD || "Password@123";
+  const defaultPasswordHash = bcrypt.hashSync(demoPassword, 10);
 
   // 1. Authorized Recruiter Accounts
   globalWithUsers.__placementMentorUsers.set("recruiter@placementmentor.com", {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -32,6 +34,24 @@ interface CollegeOverviewRecord {
 }
 
 export default function AnalyticsDashboardPage() {
+  const router = useRouter();
+  const { data: session, status: authStatus } = useSession();
+
+  useEffect(() => {
+    if (authStatus === "loading") return;
+    if (!session?.user) {
+      router.replace("/auth/login");
+      return;
+    }
+    const role = (session.user as any)?.role;
+    if (role === "recruiter" || role === "admin") {
+      router.replace("/recruiter/analytics");
+      return;
+    }
+    // Students must never access cohort-wide analytics
+    router.replace("/dashboard");
+  }, [session, authStatus, router]);
+
   const [summary, setSummary] = useState<CollegeStatistics | null>(null);
   const [colleges, setColleges] = useState<CollegeOverviewRecord[]>([]);
   const [students, setStudents] = useState<StudentAnalyticsRecord[]>([]);

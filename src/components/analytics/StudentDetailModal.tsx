@@ -17,10 +17,12 @@ export function StudentDetailModal({ student, onClose }: StudentDetailModalProps
     { label: "Coding Implementation", score: student.codingScore, weight: "25%", color: "bg-accent-secondary" },
     { label: "Mock Interview & Comm", score: student.interviewScore, weight: "20%", color: "bg-accent" },
     { label: "Resume ATS Match", score: student.resumeScore, weight: "15%", color: "bg-success" },
-    { label: "Aptitude & Logic", score: student.aptitudeScore, weight: "10%", color: "bg-warning" },
+    { label: "Aptitude (Derived from DSA)", score: student.aptitudeScore, weight: "10%", color: "bg-warning" },
   ];
 
-  const probPercent = Math.round(student.placementProbability * 100);
+  const probPercent = student.placementProbability > 1
+    ? Math.round(student.placementProbability)
+    : Math.round(student.placementProbability * 100);
 
   return (
     <AnimatePresence>
@@ -63,12 +65,12 @@ export function StudentDetailModal({ student, onClose }: StudentDetailModalProps
           {/* Key Metrics Header */}
           <div className="mt-5 grid grid-cols-2 gap-4">
             <div className="rounded-2xl border border-border bg-elevated p-4">
-              <span className="text-xs font-semibold uppercase tracking-wider text-accent">Readiness Score</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-accent">Readiness Indicator</span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-3xl font-black text-primary">{student.readinessScore}</span>
                 <span className="text-xs text-muted">/ 100</span>
               </div>
-              <p className="mt-1 text-xs text-muted">Weighted cross-domain performance</p>
+              <p className="mt-1 text-xs text-muted">Heuristic placement-readiness indicator</p>
             </div>
 
             <div className="rounded-2xl border border-border bg-elevated p-4">

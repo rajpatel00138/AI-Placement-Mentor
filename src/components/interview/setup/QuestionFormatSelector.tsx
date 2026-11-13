@@ -37,11 +37,11 @@ export default function QuestionFormatSelector() {
 
   return (
     <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
-      <h2 className="text-lg sm:text-xl font-bold text-heading">
+      <h2 className="text-lg sm:text-xl font-bold text-primary">
         Question Format
       </h2>
 
-      <p className="mt-1 text-xs sm:text-sm text-body-muted">
+      <p className="mt-1 text-xs sm:text-sm text-muted">
         Select whether you want open descriptive answers, MCQs, or a blended format.
       </p>
 
@@ -57,8 +57,8 @@ export default function QuestionFormatSelector() {
               onClick={() => setQuestionFormat(format.value)}
               className={`flex flex-col justify-between rounded-2xl border p-4 sm:p-5 text-left transition-all duration-200 cursor-pointer ${
                 active
-                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent text-heading"
-                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10 text-heading"
+                  ? "border-accent bg-accent/10 shadow-sm shadow-accent/15 ring-1 ring-accent"
+                  : "border-border bg-base hover:border-accent/50 hover:bg-soft/20 dark:hover:bg-soft/10"
               }`}
             >
               <div>
@@ -72,11 +72,17 @@ export default function QuestionFormatSelector() {
                   <Icon size={20} />
                 </div>
 
-                <h3 className="mt-3.5 text-sm sm:text-base font-bold text-heading">
+                <h3
+                  className={`mt-3.5 text-base font-bold transition ${
+                    active
+                      ? "text-slate-900 dark:text-slate-100"
+                      : "text-slate-900 dark:text-slate-100 group-hover:text-accent"
+                  }`}
+                >
                   {format.title}
                 </h3>
 
-                <p className="mt-1 text-xs leading-relaxed text-body-muted">
+                <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
                   {format.description}
                 </p>
               </div>

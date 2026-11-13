@@ -165,13 +165,13 @@ export default function RecruiterDashboardPage() {
 
           <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted">Avg Readiness</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-muted">Readiness Indicator</span>
               <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-accent/30 bg-accent/15 text-accent">
                 <TrendingUp className="h-4 w-4" />
               </div>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-primary">{avgReadiness}%</p>
-            <p className="mt-1 text-xs text-muted">Cohort-wide readiness average</p>
+            <p className="mt-1 text-xs text-muted">Heuristic readiness average (cohort)</p>
           </div>
 
           <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs">

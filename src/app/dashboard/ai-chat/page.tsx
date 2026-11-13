@@ -678,39 +678,39 @@ export default function AiMentorChatPage() {
             /* ========================================================= */
             /* EMPTY STATE: COMPACT, FRIENDLY CHAT WELCOME */
             /* ========================================================= */
-            <div className="max-w-2xl mx-auto py-4 sm:py-10 text-center space-y-4 sm:space-y-6 px-1">
+            <div className="max-w-2xl mx-auto py-2 sm:py-8 text-center space-y-2.5 sm:space-y-5 px-1">
               {/* Compact Header Greeting */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <div className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl border border-accent/30 bg-accent/10 text-accent shadow-xs mb-0.5">
-                  <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
+              <div className="space-y-1 sm:space-y-2">
+                <div className="inline-flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl border border-accent/30 bg-accent/10 text-accent shadow-xs mb-0.5">
+                  <Sparkles className="h-4 w-4 sm:h-6 sm:w-6" />
                 </div>
-                <h3 className="text-lg sm:text-2xl font-bold text-primary tracking-tight">
+                <h3 className="text-base sm:text-2xl font-bold text-primary tracking-tight">
                   How can I guide your prep today?
                 </h3>
-                <p className="text-xs sm:text-sm text-muted max-w-md mx-auto leading-relaxed">
+                <p className="text-[11px] sm:text-sm text-muted max-w-md mx-auto leading-relaxed">
                   Ask for personalized DSA roadmaps, ATS resume bullets, or interview practice.
                 </p>
               </div>
 
               {/* Suggestion Starter Cards */}
-              <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2 text-left pt-1">
+              <div className="grid gap-1.5 sm:gap-3 grid-cols-1 sm:grid-cols-2 text-left pt-0.5">
                 {STARTER_PROMPTS.map((prompt) => {
                   const Icon = prompt.icon;
                   return (
                     <button
                       key={prompt.title}
                       onClick={() => handleSendMessage(prompt.desc)}
-                      className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-border bg-elevated/70 p-3 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-soft/40 hover:border-accent/40 hover:shadow-sm cursor-pointer text-left w-full"
+                      className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-border bg-elevated/70 p-2 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-soft/40 hover:border-accent/40 hover:shadow-sm cursor-pointer text-left w-full"
                     >
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className={`p-1.5 rounded-lg sm:rounded-xl border ${prompt.accent} flex-shrink-0`}>
-                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                        <div className={`p-1 sm:p-1.5 rounded-lg sm:rounded-xl border ${prompt.accent} flex-shrink-0`}>
+                          <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
                         </div>
-                        <span className="text-xs font-bold text-primary group-hover:text-accent transition truncate">
+                        <span className="text-[11px] sm:text-xs font-bold text-primary group-hover:text-accent transition truncate">
                           {prompt.title}
                         </span>
                       </div>
-                      <p className="text-[11px] sm:text-xs text-muted line-clamp-2 leading-relaxed">
+                      <p className="text-[10px] sm:text-xs text-muted line-clamp-1 sm:line-clamp-2 leading-relaxed">
                         {prompt.desc}
                       </p>
                     </button>
@@ -718,9 +718,9 @@ export default function AiMentorChatPage() {
                 })}
               </div>
 
-              <div className="pt-1 sm:pt-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-base/60 px-3 py-0.5 text-[10px] sm:text-[11px] text-muted">
-                  <Sparkles className="h-3 w-3 text-accent shrink-0" />
+              <div className="pt-0.5 sm:pt-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-base/60 px-2.5 py-0.5 text-[9px] sm:text-[11px] text-muted">
+                  <Sparkles className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-accent shrink-0" />
                   <span>Click any card to start or type a question below</span>
                 </span>
               </div>
@@ -867,10 +867,10 @@ export default function AiMentorChatPage() {
         {/* ========================================================= */}
         {/* 3. COMPACT MODERN CHAT COMPOSER (PINNED BOTTOM) */}
         {/* ========================================================= */}
-        <div className="border-t border-border bg-surface/95 px-3 py-2 sm:px-4 sm:py-2.5 backdrop-blur-md shrink-0 w-full max-w-full">
+        <div className="border-t border-border bg-surface/95 px-2 py-1.5 sm:px-4 sm:py-2.5 backdrop-blur-md shrink-0 w-full max-w-full">
           <div className="max-w-4xl mx-auto">
             {/* Inline Single-Line Auto-Expanding Composer Pill */}
-            <div className="relative flex items-end gap-1.5 sm:gap-2 rounded-2xl sm:rounded-3xl border border-border bg-base/80 p-1 sm:p-1.5 shadow-xs focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-all">
+            <div className="relative flex items-end gap-1 sm:gap-2 rounded-2xl sm:rounded-3xl border border-border bg-base/80 p-0.5 sm:p-1.5 shadow-xs focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-all">
               {/* Textarea */}
               <textarea
                 ref={textareaRef}
@@ -880,7 +880,7 @@ export default function AiMentorChatPage() {
                 placeholder="Ask AI Mentor anything about DSA, roadmap, or resume..."
                 disabled={isGenerating}
                 rows={1}
-                className="flex-1 resize-none bg-transparent px-2.5 py-1.5 text-xs sm:text-sm text-primary placeholder-muted outline-none disabled:opacity-60 min-h-[34px] sm:min-h-[36px] max-h-32 sm:max-h-40 overflow-y-auto leading-relaxed"
+                className="flex-1 resize-none bg-transparent px-2 py-1 sm:px-2.5 sm:py-1.5 text-xs sm:text-sm text-primary placeholder-muted outline-none disabled:opacity-60 min-h-[30px] sm:min-h-[36px] max-h-28 sm:max-h-40 overflow-y-auto leading-relaxed"
               />
 
               {/* Action Button */}
@@ -889,20 +889,20 @@ export default function AiMentorChatPage() {
                   <button
                     type="button"
                     onClick={handleStopGenerating}
-                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-error/15 border border-error/30 text-error hover:bg-error hover:text-white shadow-xs transition cursor-pointer"
+                    className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-error/15 border border-error/30 text-error hover:bg-error hover:text-white shadow-xs transition cursor-pointer"
                     title="Stop generating"
                   >
-                    <Square className="h-3 w-3 fill-current" />
+                    <Square className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-current" />
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => handleSendMessage()}
                     disabled={!inputValue.trim() || isGenerating}
-                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-accent hover:bg-accent-hover text-on-accent shadow-xs transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 disabled:cursor-not-allowed cursor-pointer"
+                    className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-accent hover:bg-accent-hover text-on-accent shadow-xs transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 disabled:cursor-not-allowed cursor-pointer"
                     title="Send message"
                   >
-                    <Send className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5" />
+                    <Send className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </button>
                 )}
               </div>

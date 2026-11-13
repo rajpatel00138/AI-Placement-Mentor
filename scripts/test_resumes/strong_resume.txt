@@ -1,0 +1,38 @@
+Arjun Sharma
+Email: arjun.sharma@example.com | Phone: +1-555-0199 | LinkedIn: linkedin.com/in/arjunsharma | GitHub: github.com/arjunsharma
+
+EDUCATION
+Bachelor of Technology in Computer Science & Engineering, Top Tier University (2021 - 2025)
+CGPA: 9.4/10.0 | Dean's Academic Excellence Honor Roll (Top 1%)
+
+EXPERIENCE
+Software Engineering Intern | Google | Mountain View, CA (May 2024 - August 2024)
+- Architected and deployed an asynchronous distributed caching service using Redis, Go, and Kafka, reducing 99th percentile API latency by 42% across 10M daily requests.
+- Engineered high-throughput event ingestion pipelines utilizing Apache Kafka and Protobuf, increasing system ingestion capacity by 65%.
+- Implemented automated end-to-end testing suites with Jest and Playwright, achieving 94% code coverage and eliminating regression bugs in weekly releases.
+- Spearheaded Kubernetes microservice deployment manifests and GitHub Actions CI/CD pipelines, decreasing deployment cycle time by 35%.
+
+Software Engineering Intern | Walmart Labs | Sunnyvale, CA (Jan 2024 - April 2024)
+- Developed responsive high-performance full-stack dashboards using Next.js 14, React, TypeScript, and Tailwind CSS, improving Core Web Vitals LCP by 38%.
+- Optimized complex PostgreSQL relational queries and added composite indexing, reducing average database query execution time from 420ms to 45ms (89% improvement).
+
+PROJECTS
+HyperScale: Distributed In-Memory Key-Value Store (Go, Raft, Docker, gRPC)
+- Implemented Raft distributed consensus protocol from scratch with leader election, log replication, and split-brain resolution.
+- Benchmarked at 180,000 requests per second with sub-5ms latency across 5-node distributed cluster.
+- Containerized entire cluster using Docker and Docker Compose with automated health checks.
+
+AI-Powered Placement Mentor Platform (TypeScript, Next.js, PostgreSQL, Prisma, Tailwind, Gemini API)
+- Engineered full-stack recruitment diagnostics system supporting 50+ concurrent users with sub-second analytics generation.
+- Designed modular architecture with Auth.js session security, role-based access control, and responsive design across desktop and mobile viewports.
+
+HONORS & ACHIEVEMENTS
+- Winner (1st place out of 250 teams), National Smart India Hackathon 2023.
+- Candidate Master / Knight on LeetCode (Rating: 2150, 850+ Data Structures & Algorithms problems solved).
+- Rank 42 out of 18,000 participants in Global Code Competition.
+
+TECHNICAL SKILLS
+Languages: TypeScript, JavaScript, Python, Go, C++, SQL, HTML, CSS
+Frameworks & Libraries: React, Next.js, Node.js, Express, FastAPI, Tailwind CSS, Jest, Playwright
+Databases & Tools: PostgreSQL, MongoDB, Redis, Docker, Kubernetes, Git, GitHub Actions, AWS, Kafka, Linux
+

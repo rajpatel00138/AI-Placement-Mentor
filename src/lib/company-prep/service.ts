@@ -44,6 +44,7 @@ export interface CompanyStats {
 // In-memory / JSON store cache
 let cachedQuestions: CompanyQuestionItem[] | null = null;
 let cachedCompaniesMap: Map<string, CompanyMeta> | null = null;
+let cachedCompaniesResult: CompanyMeta[] | null = null;
 
 const fallbackProgressStore = new Map<string, "SOLVED" | "BOOKMARKED" | "UNSOLVED">();
 const QUESTIONS_STORE_PATH = path.join(process.cwd(), "data", "company_prep_store.json");
@@ -83,6 +84,10 @@ function loadQuestionsFromDisk(): CompanyQuestionItem[] {
 }
 
 export async function getCompaniesList(): Promise<CompanyMeta[]> {
+  if (cachedCompaniesResult && cachedCompaniesResult.length > 0) {
+    return cachedCompaniesResult;
+  }
+
   if (shouldUsePrisma()) {
     try {
       if ((prisma as any).companyQuestion) {
@@ -128,7 +133,8 @@ export async function getCompaniesList(): Promise<CompanyMeta[]> {
             }
           }
 
-          return Array.from(map.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+          cachedCompaniesResult = Array.from(map.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+          return cachedCompaniesResult;
         }
       }
     } catch (err) {
@@ -138,7 +144,8 @@ export async function getCompaniesList(): Promise<CompanyMeta[]> {
 
   // Fallback / fast memory lookup
   if (cachedCompaniesMap && cachedCompaniesMap.size > 0) {
-    return Array.from(cachedCompaniesMap.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+    cachedCompaniesResult = Array.from(cachedCompaniesMap.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+    return cachedCompaniesResult;
   }
 
   const questions = loadQuestionsFromDisk();
@@ -169,7 +176,8 @@ export async function getCompaniesList(): Promise<CompanyMeta[]> {
   }
 
   cachedCompaniesMap = map;
-  return Array.from(map.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+  cachedCompaniesResult = Array.from(map.values()).sort((a, b) => b.totalQuestions - a.totalQuestions);
+  return cachedCompaniesResult;
 }
 
 export interface GetQuestionsParams {
@@ -278,7 +286,12 @@ export async function getCompanyQuestions(params: GetQuestionsParams) {
     const tfClean = timeframe.toLowerCase().replace(/[-_\s]+/g, "");
     const tfMatch = filtered.filter((q) => {
       const qClean = q.timeframe.toLowerCase().replace(/[-_\s]+/g, "");
-      return qClean === tfClean || q.timeframe.toLowerCase() === timeframe.toLowerCase();
+      return (
+        qClean === tfClean ||
+        q.timeframe.toLowerCase() === timeframe.toLowerCase() ||
+        ((tfClean === "1year" || tfClean === "oneyear") && (qClean === "morethansixmonths" || qClean === "oneyear" || qClean === "1year")) ||
+        (tfClean === "morethansixmonths" && (qClean === "1year" || qClean === "oneyear" || qClean === "morethansixmonths"))
+      );
     });
     if (tfMatch.length > 0) {
       filtered = tfMatch;

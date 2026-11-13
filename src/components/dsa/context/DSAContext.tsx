@@ -92,6 +92,36 @@ export function DSAProvider({
   const [status, setStatus] = useState<StatusMap>({});
   const [favorites, setFavorites] = useState<FavoriteMap>({});
 
+  // 0. Load Local Storage for Revisions & Bookmarks (Client Persistence)
+  useEffect(() => {
+    try {
+      const savedRevisions = localStorage.getItem("dsa_revisions");
+      if (savedRevisions) setRevisions(JSON.parse(savedRevisions));
+      const savedFavorites = localStorage.getItem("dsa_favorites");
+      if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
+    } catch {
+      // ignore storage access errors
+    }
+  }, []);
+
+  // Save Revisions to Local Storage on change
+  useEffect(() => {
+    try {
+      if (Object.keys(revisions).length > 0) {
+        localStorage.setItem("dsa_revisions", JSON.stringify(revisions));
+      }
+    } catch {}
+  }, [revisions]);
+
+  // Save Bookmarks to Local Storage on change
+  useEffect(() => {
+    try {
+      if (Object.keys(favorites).length > 0) {
+        localStorage.setItem("dsa_favorites", JSON.stringify(favorites));
+      }
+    } catch {}
+  }, [favorites]);
+
   // 1. Load Solves from Backend (Single Source of Truth)
   useEffect(() => {
     async function loadBackendSolves() {

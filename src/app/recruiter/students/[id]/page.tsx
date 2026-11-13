@@ -177,23 +177,24 @@ export default function StudentDeepDivePage() {
           {/* Right: Primary Score Badges */}
           <div className="flex items-center justify-center lg:justify-end gap-4 border-t lg:border-t-0 border-border pt-4 lg:pt-0">
             {/* Readiness Score */}
-            <div className="rounded-2xl border border-border bg-elevated/70 p-4 text-center min-w-[120px] shadow-xs">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Readiness Score</p>
+            <div className="rounded-2xl border border-border bg-elevated/70 p-4 text-center min-w-[140px] shadow-xs">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Readiness Indicator</p>
               <div className="text-2xl sm:text-3xl font-black text-primary mt-1">
                 {student.readinessScore}%
               </div>
+              <p className="text-[9px] text-muted font-medium mt-0.5">heuristic indicator</p>
               <span className={`inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold border ${getScoreColorClass(student.readinessScore)}`}>
                 {student.readinessScore >= 70 ? "Placement Ready" : student.readinessScore >= 40 ? "Moderate" : "Building"}
               </span>
             </div>
 
             {/* Placement Probability */}
-            <div className="rounded-2xl border border-border bg-elevated/70 p-4 text-center min-w-[120px] shadow-xs">
+            <div className="rounded-2xl border border-border bg-elevated/70 p-4 text-center min-w-[140px] shadow-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Placement Prob</p>
               <div className="text-2xl sm:text-3xl font-black text-accent mt-1">
                 {student.placementProbability}%
               </div>
-              <p className="text-[10px] text-muted mt-1">AI Predicted Chance</p>
+              <p className="text-[9px] text-muted font-medium mt-0.5">Logistic (k=0.08, x₀=55)</p>
             </div>
           </div>
         </div>

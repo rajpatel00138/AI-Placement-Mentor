@@ -8,6 +8,21 @@ export async function GET(
 ) {
   try {
     const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please sign in to access college analytics." },
+        { status: 401 }
+      );
+    }
+
+    const userRole = (session.user as any).role;
+    if (userRole !== "recruiter" && userRole !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden. College analytics are restricted to recruiters." },
+        { status: 403 }
+      );
+    }
+
     const { collegeId } = await context.params;
 
     if (!collegeId || typeof collegeId !== "string") {

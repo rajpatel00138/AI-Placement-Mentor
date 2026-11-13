@@ -48,11 +48,10 @@ export default function SignupPage() {
     }
 
     if (role === "recruiter") {
-      router.push("/recruiter/dashboard");
+      window.location.href = "/recruiter/dashboard";
     } else {
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }
-    router.refresh();
   }
 
   async function handleGoogleSignUp() {

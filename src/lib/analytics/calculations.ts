@@ -92,23 +92,12 @@ export function calculatePlacementProbability(
   const midpoint = 55;
   const k = 0.08;
 
-  // Base logistic sigmoid scaling
-  let probability = 1 / (1 + Math.exp(-k * (readiness - midpoint)));
+  // Standard logistic sigmoid formula matching the research paper:
+  // P(placement) = 1 / (1 + e^(-k * (readiness - midpoint)))
+  const probability = 1 / (1 + Math.exp(-k * (readiness - midpoint)));
 
-  // Domain balance adjustment:
-  const dsa = student.dsaScore ?? readiness;
-  const interview = student.interviewScore ?? readiness;
-
-  if (dsa >= 75 && interview >= 75) {
-    // Strong all-rounder bonus
-    probability += 0.04;
-  } else if (dsa < 35 || interview < 35) {
-    // Critical deficiency penalty
-    probability -= 0.06;
-  }
-
-  // Clamp probability between 0.05 and 0.99
-  const clamped = Math.max(0.05, Math.min(0.99, probability));
+  // Clamp probability between 0.01 and 0.99
+  const clamped = Math.max(0.01, Math.min(0.99, probability));
   return Number(clamped.toFixed(2));
 }
 
